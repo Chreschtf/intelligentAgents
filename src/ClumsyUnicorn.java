@@ -6,22 +6,33 @@ import negotiator.actions.Offer;
 import negotiator.parties.AbstractNegotiationParty;
 import negotiator.parties.NegotiationInfo;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.PriorityQueue;
 
-/**
- * ExampleAgent returns the bid that maximizes its own utility for half of the negotiation session.
- * In the second half, it offers a random bid. It only accepts the bid on the table in this phase,
- * if the utility of the bid is higher than Example Agent's last bid.
- */
+
+
 public class ClumsyUnicorn extends AbstractNegotiationParty {
     private final String description = "Clumsy Unicorn";
 
     private Bid lastReceivedOffer; // offer on the table
     private Bid myLastOffer;
+    private ArrayList<Offer> receivedOffers;
+    private double utilityThreshold;
 
     @Override
     public void init(NegotiationInfo info) {
         super.init(info);
+        receivedOffers = new ArrayList<Offer>() ;
+
+        try {
+            Bid minBid = this.utilitySpace.getMinUtilityBid();
+            Bid maxBid = this.utilitySpace.getMaxUtilityBid();
+            utilityThreshold = (getUtility(maxBid)-getUtility(minBid))/2+getUtility(minBid);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -44,7 +55,7 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
         // First half of the negotiation offering the max utility (the best agreement possible) for Example Agent
         if (time < 0.5) {
             return new Offer(this.getPartyId(), this.getMaxUtilityBid());
-        } else {
+        } else if (time<0.9){
 
             // Accepts the bid on the table in this phase,
             // if the utility of the bid is higher than Example Agent's last bid.
@@ -55,9 +66,13 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
                 return new Accept(this.getPartyId(), lastReceivedOffer);
             } else {
                 // Offering a random bid
-                myLastOffer = generateRandomBid();
+                do {
+                    myLastOffer = generateRandomBid();
+                }while (this.utilitySpace.getUtility(myLastOffer) < utilityThreshold ) ;
                 return new Offer(this.getPartyId(), myLastOffer);
             }
+        }else{
+            return new Accept(this.getPartyId(),lastReceivedOffer);
         }
     }
 
@@ -72,6 +87,8 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
 
         if (act instanceof Offer) { // sender is making an offer
             Offer offer = (Offer) act;
+
+            receivedOffers.add(offer);
 
             // storing last received offer
             lastReceivedOffer = offer.getBid();
@@ -94,5 +111,9 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public double getOfferUtility(Bid bid){
+        return this.utilitySpace.getUtility(bid);
     }
 }
