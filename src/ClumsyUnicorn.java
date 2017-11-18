@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.PriorityQueue;
 
+import intelligentAgents.Opponent;
 
 
 public class ClumsyUnicorn extends AbstractNegotiationParty {
@@ -20,7 +21,9 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
     private Bid myLastOffer;
     private ArrayList<Offer> receivedOffers;
     private double utilityThreshold;
-
+    private Opponent op1;
+    private Opponent op2;
+    
     @Override
     public void init(NegotiationInfo info) {
         super.init(info);
@@ -87,11 +90,18 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
 
         if (act instanceof Offer) { // sender is making an offer
             Offer offer = (Offer) act;
-
+            
+            if (this.lastReceivedOffer != null) {
+            	this.getOpponent(sender).rejectedOffers.add(this.lastReceivedOffer);
+            }
+            this.getOpponent(sender).offers.add(offer.getBid());
+            
             receivedOffers.add(offer);
 
             // storing last received offer
             lastReceivedOffer = offer.getBid();
+        } else if(act instanceof Accept) {
+        	this.getOpponent(sender).acceptedOffers.add(this.lastReceivedOffer);
         }
     }
 
@@ -115,5 +125,19 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
 
     public double getOfferUtility(Bid bid){
         return this.utilitySpace.getUtility(bid);
+    }
+    private Opponent getOpponent(AgentID sender) {
+    	if(this.op1 == null) {
+    		this.op1 = new Opponent(sender);
+    		return this.op1;
+    	} else if (this.op1.agentId == sender) {
+    		return this.op1;
+    	} else if (this.op2 == null) {
+    		this.op2 = new Opponent(sender);
+    		return this.op2;
+    	} else if (this.op2.agentId == sender) {
+    		return this.op2; 
+    	}
+    	return this.op1;
     }
 }
