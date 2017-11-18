@@ -20,6 +20,7 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
     private double utilityThreshold;
     private Opponent op1;
     private Opponent op2;
+    private Offer lastOffer;
     
     @Override
     public void init(NegotiationInfo info) {
@@ -33,7 +34,6 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     /**
@@ -89,16 +89,17 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
             Offer offer = (Offer) act;
             
             if (this.lastReceivedOffer != null) {
-            	this.getOpponent(sender).rejectedOffers.add(this.lastReceivedOffer);
+            	this.getOpponent(sender).addReject(this.lastOffer);
             }
-            this.getOpponent(sender).offers.add(offer.getBid());
+            this.getOpponent(sender).addOffer(offer);
             
             receivedOffers.add(offer);
 
             // storing last received offer
             lastReceivedOffer = offer.getBid();
+            this.lastOffer = offer;
         } else if(act instanceof Accept) {
-        	this.getOpponent(sender).acceptedOffers.add(this.lastReceivedOffer);
+        	this.getOpponent(sender).addAccept(this.lastOffer);
         }
     }
 
