@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.PriorityQueue;
 
-import intelligentAgents.Opponent;
-
 public class ClumsyUnicorn extends AbstractNegotiationParty {
     private final String description = "Clumsy Unicorn";
 

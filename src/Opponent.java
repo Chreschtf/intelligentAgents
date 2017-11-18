@@ -1,4 +1,4 @@
-package intelligentAgents;
+
 import java.util.ArrayList;
 import negotiator.actions.Offer;
 import negotiator.AgentID;
