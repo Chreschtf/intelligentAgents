@@ -3,6 +3,7 @@ import negotiator.Bid;
 import negotiator.actions.Accept;
 import negotiator.actions.Action;
 import negotiator.actions.Offer;
+import negotiator.issue.Issue;
 import negotiator.parties.AbstractNegotiationParty;
 import negotiator.parties.NegotiationInfo;
 
@@ -17,12 +18,14 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
     private Bid lastReceivedOffer; // offer on the table
     private Bid myLastOffer;
     private ArrayList<Offer> receivedOffers;
+    
     private double utilityThreshold;
     private Opponent op1;
     private Opponent op2;
     private Offer lastOffer;
     private double maxUtility;
     private double minUtility;
+    private List<Issue> allIssues;
     
     @Override
     public void init(NegotiationInfo info) {
@@ -38,6 +41,8 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        
+        allIssues = info.getUtilitySpace().getDomain().getIssues();
     }
 
     /**
@@ -125,9 +130,9 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
         return null;
     }
 
-    public double getOfferUtility(Bid bid){
-        return this.utilitySpace.getUtility(bid);
-    }
+//    public double getOfferUtility(Bid bid){
+//        return this.utilitySpace.getUtility(bid);
+//    }
     
     public Bid generateRandomBidWithTreshold(double utilityThreshold) {
     	if(utilityThreshold>this.maxUtility) {
@@ -140,8 +145,7 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
             randomBid = generateRandomBid();
             try {
                 utility = utilitySpace.getUtility(randomBid);
-            } catch (Exception e)
-            {
+            } catch (Exception e){
                 utility = 0.0;
             }
         }
@@ -151,8 +155,7 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
     
     private double timePressure(double time) {
     	double ep = 0.9;
-//    	return 1 - (time^(1/ep));
-    	return 1;
+    	return 1 - Math.pow(time, (1/ep));
     }
     
     private Opponent getOpponent(AgentID sender) {
