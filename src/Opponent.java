@@ -1,6 +1,9 @@
 
 import java.util.ArrayList;
+import java.util.List;
+
 import negotiator.actions.Offer;
+import negotiator.issue.Issue;
 import negotiator.AgentID;
 import negotiator.Bid;
 
@@ -32,6 +35,11 @@ public class Opponent {
 	public void addReject(Offer offer) {
 		rejectedOffers.add(offer);
 		rejectedBids.add(offer.getBid());
+		
+		List<Issue> issues = offer.getBid().getIssues();
+		for(int i = 0; i < issues.size(); i++) {
+			issues.get(i);
+		}
 	}
 	
 	//Add Offer Made by the agent
@@ -44,5 +52,6 @@ public class Opponent {
 	public void addAccept(Offer offer) {
 		acceptedOffers.add(offer);
 		acceptedBids.add(offer.getBid());
+		
 	}
 }

@@ -21,6 +21,8 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
     private Opponent op1;
     private Opponent op2;
     private Offer lastOffer;
+    private double maxUtility;
+    private double minUtility;
     
     @Override
     public void init(NegotiationInfo info) {
@@ -30,7 +32,9 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
         try {
             Bid minBid = this.utilitySpace.getMinUtilityBid();
             Bid maxBid = this.utilitySpace.getMaxUtilityBid();
-            utilityThreshold = (getUtility(maxBid)-getUtility(minBid))/2+getUtility(minBid);
+            maxUtility = getUtility(maxBid);
+            minUtility = getUtility(minBid);
+            utilityThreshold = (maxUtility-minUtility)/2+minUtility;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -124,6 +128,33 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
     public double getOfferUtility(Bid bid){
         return this.utilitySpace.getUtility(bid);
     }
+    
+    public Bid generateRandomBidWithTreshold(double utilityThreshold) {
+    	if(utilityThreshold>this.maxUtility) {
+    		return generateRandomBidWithTreshold(this.maxUtility);
+    	}
+    	
+        Bid randomBid;
+        double utility;
+        do {
+            randomBid = generateRandomBid();
+            try {
+                utility = utilitySpace.getUtility(randomBid);
+            } catch (Exception e)
+            {
+                utility = 0.0;
+            }
+        }
+        while (utility < utilityThreshold);
+        return randomBid;
+    }
+    
+    private double timePressure(double time) {
+    	double ep = 0.9;
+//    	return 1 - (time^(1/ep));
+    	return 1;
+    }
+    
     private Opponent getOpponent(AgentID sender) {
     	if(this.op1 == null) {
     		this.op1 = new Opponent(sender);
