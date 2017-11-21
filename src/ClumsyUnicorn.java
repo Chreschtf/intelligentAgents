@@ -59,8 +59,10 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
         double time = getTimeLine().getTime(); // Gets the time, running from t = 0 (start) to t = 1 (deadline).
         // The time is normalized, so agents need not be
         // concerned with the actual internal clock.
-
-
+        
+        double treshold = this.calcUtilityTreshold();
+        System.out.println(treshold);
+        
         // First half of the negotiation offering the max utility (the best agreement possible) for Example Agent
         if (time < 0.5) {
             return new Offer(this.getPartyId(), this.getMaxUtilityBid());
@@ -156,6 +158,11 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
     private double timePressure(double time) {
     	double ep = 0.9;
     	return 1 - Math.pow(time, (1/ep));
+    }
+    
+    private double calcUtilityTreshold(){
+    	double tp = this.timePressure(getTimeLine().getTime());
+    	return (this.maxUtility * tp); 
     }
     
     private Opponent getOpponent(AgentID sender) {
