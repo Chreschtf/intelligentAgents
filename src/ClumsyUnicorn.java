@@ -60,31 +60,19 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
         // The time is normalized, so agents need not be
         // concerned with the actual internal clock.
         
-        double treshold = this.calcUtilityTreshold();
-        System.out.println(treshold);
-        
-        // First half of the negotiation offering the max utility (the best agreement possible) for Example Agent
-        if (time < 0.5) {
-            return new Offer(this.getPartyId(), this.getMaxUtilityBid());
-        } else if (time<0.9){
-
-            // Accepts the bid on the table in this phase,
-            // if the utility of the bid is higher than Example Agent's last bid.
-            if (lastReceivedOffer != null
-                    && myLastOffer != null
-                    && this.utilitySpace.getUtility(lastReceivedOffer) > this.utilitySpace.getUtility(myLastOffer)) {
-
-                return new Accept(this.getPartyId(), lastReceivedOffer);
-            } else {
-                // Offering a random bid
-                do {
-                    myLastOffer = generateRandomBid();
-                }while (this.utilitySpace.getUtility(myLastOffer) < utilityThreshold ) ;
-                return new Offer(this.getPartyId(), myLastOffer);
-            }
-        }else{
-            return new Accept(this.getPartyId(),lastReceivedOffer);
+        if (time >= 0.9) {
+        	return new Accept(this.getPartyId(),lastReceivedOffer);
         }
+        
+        double treshold = this.calcUtilityTreshold();
+        
+        if (lastReceivedOffer != null 
+        	&& this.utilitySpace.getUtility(lastReceivedOffer) > treshold) { 
+            return new Accept(this.getPartyId(), lastReceivedOffer);
+        } else {
+        	return new Offer(this.getPartyId(), this.generateRandomBidWithTreshold(treshold));
+        }
+
     }
 
     /**
@@ -109,7 +97,7 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
             // storing last received offer
             lastReceivedOffer = offer.getBid();
             this.lastOffer = offer;
-        } else if(act instanceof Accept) {
+        } else if(act instanceof Accept && this.lastOffer != null) {
         	this.getOpponent(sender).addAccept(this.lastOffer);
         }
     }
@@ -138,7 +126,7 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
     
     public Bid generateRandomBidWithTreshold(double utilityThreshold) {
     	if(utilityThreshold>this.maxUtility) {
-    		return generateRandomBidWithTreshold(this.maxUtility);
+    		return this.getMaxUtilityBid();
     	}
     	
         Bid randomBid;
@@ -156,13 +144,15 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
     }
     
     private double timePressure(double time) {
-    	double ep = 0.9;
+    	double ep = 0.4;
     	return 1 - Math.pow(time, (1/ep));
     }
     
     private double calcUtilityTreshold(){
     	double tp = this.timePressure(getTimeLine().getTime());
-    	return (this.maxUtility * tp); 
+    	double treshold = (this.maxUtility * tp);
+        System.out.println("Treshold:" + treshold);
+    	return treshold; 
     }
     
     private Opponent getOpponent(AgentID sender) {
