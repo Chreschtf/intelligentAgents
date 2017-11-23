@@ -1,0 +1,64 @@
+import negotiator.issue.ISSUETYPE;
+import negotiator.issue.Issue;
+import negotiator.issue.IssueDiscrete;
+import negotiator.issue.IssueInteger;
+import negotiator.issue.IssueReal;
+import negotiator.issue.Value;
+import negotiator.issue.ValueDiscrete;
+import negotiator.issue.ValueReal;
+import negotiator.issue.ValueInteger;
+import negotiator.utility.AdditiveUtilitySpace;
+import negotiator.utility.EvaluatorDiscrete;
+import java.util.Comparator;
+import java.util.List;
+
+public class GirIssue {
+	protected int number;
+	protected double weight;
+	protected ISSUETYPE type;
+	
+	protected GirIssue(Issue issue, AdditiveUtilitySpace uSpace){
+		this.number = issue.getNumber();
+		this.weight = uSpace.getWeight(this.number);
+		this.type   = issue.getType();
+		
+		switch (this.type) {
+		    case REAL:
+		        IssueReal issueReal = (IssueReal) issue;
+		        double upperRealBound = issueReal.getUpperBound();
+		        double lowerRealBound = issueReal.getLowerBound();
+	
+		        // accessing to the old value
+		        // ValueReal valueReal = (ValueReal) bid.getValue(issueNumber);
+		        
+		    case INTEGER:
+		        IssueInteger issueInteger = (IssueInteger) issue;
+		        int upperIntegerBound = issueInteger.getUpperBound();
+		        int lowerIntegerBound = issueInteger.getLowerBound();
+	
+		        // accessing to the old value
+		        // ValueInteger valueInteger = (ValueInteger) bid.getValue(issueNumber);
+	
+	
+		    case DISCRETE:
+		        IssueDiscrete issueDiscrete = (IssueDiscrete) issue;
+		        List<ValueDiscrete> allValues = issueDiscrete.getValues();
+	
+		        // accessing to the old value
+		        // ValueDiscrete valueDiscrete = (ValueDiscrete) bid.getValue(issueNumber);
+		}
+	}
+	
+	protected static Comparator<GirIssue> weightComparator = new Comparator<GirIssue>() {
+		public int compare(GirIssue i1, GirIssue i2) {
+		   return Double.compare(i2.weight, i1.weight);
+	   }
+	};
+	
+	protected static Comparator<GirIssue> numberComparator = new Comparator<GirIssue>() {
+		public int compare(GirIssue i1, GirIssue i2) {
+		   return Integer.compare(i1.number, i2.number);
+	   }
+	};
+
+}

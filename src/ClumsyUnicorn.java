@@ -4,8 +4,12 @@ import negotiator.actions.Accept;
 import negotiator.actions.Action;
 import negotiator.actions.Offer;
 import negotiator.issue.Issue;
+import negotiator.issue.IssueDiscrete;
 import negotiator.parties.AbstractNegotiationParty;
 import negotiator.parties.NegotiationInfo;
+import negotiator.utility.AbstractUtilitySpace;
+import negotiator.utility.AdditiveUtilitySpace;
+import negotiator.utility.EvaluatorDiscrete;
 
 import java.util.Comparator;
 import java.util.List;
@@ -15,17 +19,18 @@ import java.util.PriorityQueue;
 public class ClumsyUnicorn extends AbstractNegotiationParty {
     private final String description = "Clumsy Unicorn";
 
-    private Bid lastReceivedOffer; // offer on the table
+//    private Bid lastReceivedOffer; // offer on the table
     private Bid myLastOffer;
     private ArrayList<Offer> receivedOffers;
     
-    private double utilityThreshold;
+//    private double utilityThreshold;
     private Opponent op1;
     private Opponent op2;
     private Offer lastOffer;
     private double maxUtility;
     private double minUtility;
-    private List<Issue> allIssues;
+    private NegotiationInfo info;
+    private List<GirIssue> girIssues;
     
     @Override
     public void init(NegotiationInfo info) {
@@ -37,12 +42,12 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
             Bid maxBid = this.utilitySpace.getMaxUtilityBid();
             maxUtility = getUtility(maxBid);
             minUtility = getUtility(minBid);
-            utilityThreshold = (maxUtility-minUtility)/2+minUtility;
+//            utilityThreshold = (maxUtility-minUtility)/2+minUtility;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
-        allIssues = info.getUtilitySpace().getDomain().getIssues();
+        this.info = info;
+        this.mapDomain();
     }
 
     /**
@@ -61,18 +66,18 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
         // concerned with the actual internal clock.
         
         if (time >= 0.9) {
-        	return new Accept(this.getPartyId(),lastReceivedOffer);
+        	return new Accept(this.getPartyId(),this.lastOffer.getBid());
         }
         
         double treshold = this.calcUtilityTreshold();
         
-        if (lastReceivedOffer != null 
-        	&& this.utilitySpace.getUtility(lastReceivedOffer) > treshold) { 
-            return new Accept(this.getPartyId(), lastReceivedOffer);
+        if (this.lastOffer != null 
+        	&& this.utilitySpace.getUtility(this.lastOffer.getBid()) > treshold) { 
+            return new Accept(this.getPartyId(), this.lastOffer.getBid());
         } else {
-        	return new Offer(this.getPartyId(), this.generateRandomBidWithTreshold(treshold));
+        	this.lastOffer = new Offer(this.getPartyId(), this.generateRandomBidWithTreshold(treshold));
+        	return this.lastOffer;
         }
-
     }
 
     /**
@@ -87,7 +92,7 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
         if (act instanceof Offer) { // sender is making an offer
             Offer offer = (Offer) act;
             
-            if (this.lastReceivedOffer != null) {
+            if (this.lastOffer != null) {
             	this.getOpponent(sender).addReject(this.lastOffer);
             }
             this.getOpponent(sender).addOffer(offer);
@@ -95,7 +100,6 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
             receivedOffers.add(offer);
 
             // storing last received offer
-            lastReceivedOffer = offer.getBid();
             this.lastOffer = offer;
         } else if(act instanceof Accept && this.lastOffer != null) {
         	this.getOpponent(sender).addAccept(this.lastOffer);
@@ -153,6 +157,27 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
     	double treshold = (this.maxUtility * tp);
         System.out.println("Treshold:" + treshold);
     	return treshold; 
+    }
+    
+    private void mapDomain() {
+    	this.girIssues = new ArrayList<GirIssue>();
+    	
+    	AbstractUtilitySpace utilitySpace = this.info.getUtilitySpace();
+    	AdditiveUtilitySpace uSpace = (AdditiveUtilitySpace) utilitySpace;
+    	
+    	List<Issue>issues = uSpace.getDomain().getIssues();
+    	
+    	for (Issue issue : issues) {
+    		this.girIssues.add(new GirIssue(issue, uSpace));
+    	}
+    	this.girIssues.sort(GirIssue.weightComparator);
+    	for(GirIssue girIssue : girIssues) {
+    		System.out.println("Number: " + girIssue.number + " Weight: " + girIssue.weight);
+    	}
+    	this.girIssues.sort(GirIssue.numberComparator);
+    	for(GirIssue girIssue : girIssues) {
+    		System.out.println("Number: " + girIssue.number + " Weight: " + girIssue.weight);
+    	}
     }
     
     private Opponent getOpponent(AgentID sender) {

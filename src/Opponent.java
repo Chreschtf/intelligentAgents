@@ -9,17 +9,17 @@ import negotiator.Bid;
 
 
 public class Opponent {
-	public ArrayList<Offer> offers;
-	public ArrayList<Offer> rejectedOffers;
-	public ArrayList<Offer> acceptedOffers;
+	protected ArrayList<Offer> offers;
+	protected ArrayList<Offer> rejectedOffers;
+	protected ArrayList<Offer> acceptedOffers;
 	
-	public ArrayList<Bid> bids;
-	public ArrayList<Bid> rejectedBids;
-	public ArrayList<Bid> acceptedBids;
+	protected ArrayList<Bid> bids;
+	protected ArrayList<Bid> rejectedBids;
+	protected ArrayList<Bid> acceptedBids;
 	
-	public AgentID agentId;
+	protected AgentID agentId;
 	
-	public Opponent(AgentID id) {
+	protected Opponent(AgentID id) {
 		this.agentId = id;
 		
 		offers = new ArrayList<Offer>();
@@ -32,24 +32,19 @@ public class Opponent {
 	}
 	
 	//Add Offer rejected by the agent
-	public void addReject(Offer offer) {
+	protected void addReject(Offer offer) {
 		rejectedOffers.add(offer);
 		rejectedBids.add(offer.getBid());
-		
-		List<Issue> issues = offer.getBid().getIssues();
-		for(int i = 0; i < issues.size(); i++) {
-			issues.get(i);
-		}
 	}
 	
 	//Add Offer Made by the agent
-	public void addOffer(Offer offer) {
+	protected void addOffer(Offer offer) {
 		offers.add(offer);
 		bids.add(offer.getBid());
 	}
 	
 	//Add Offer made by the agent
-	public void addAccept(Offer offer) {
+	protected void addAccept(Offer offer) {
 		acceptedOffers.add(offer);
 		acceptedBids.add(offer.getBid());
 		
