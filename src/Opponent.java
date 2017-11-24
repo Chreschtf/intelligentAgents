@@ -19,7 +19,9 @@ public class Opponent {
 	
 	protected AgentID agentId;
 	
-	protected Opponent(AgentID id) {
+	protected List<GirIssue> issues;
+	
+	protected Opponent(AgentID id, List<GirIssue> issues) {
 		this.agentId = id;
 		
 		offers = new ArrayList<Offer>();
@@ -29,6 +31,8 @@ public class Opponent {
 		bids = new ArrayList<Bid>();
 		rejectedBids = new ArrayList<Bid>();
 		acceptedBids = new ArrayList<Bid>();
+		
+		this.issues = new ArrayList<GirIssue>(issues);
 	}
 	
 	//Add Offer rejected by the agent
@@ -43,10 +47,15 @@ public class Opponent {
 		bids.add(offer.getBid());
 	}
 	
-	//Add Offer made by the agent
+	//Add Offer Accepted by the agent
 	protected void addAccept(Offer offer) {
-		acceptedOffers.add(offer);
-		acceptedBids.add(offer.getBid());
+		Bid bid = offer.getBid();
 		
+		acceptedOffers.add(offer);
+		acceptedBids.add(bid);
+		
+		for(GirIssue issue : this.issues) {
+			bid.getValue(issue.number);
+		}
 	}
 }

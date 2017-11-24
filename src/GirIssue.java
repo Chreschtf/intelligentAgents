@@ -11,16 +11,20 @@ import negotiator.utility.AdditiveUtilitySpace;
 import negotiator.utility.EvaluatorDiscrete;
 import java.util.Comparator;
 import java.util.List;
+import java.util.ArrayList;
 
 public class GirIssue {
 	protected int number;
 	protected double weight;
 	protected ISSUETYPE type;
+	protected List<GirValue> girValues;
 	
 	protected GirIssue(Issue issue, AdditiveUtilitySpace uSpace){
 		this.number = issue.getNumber();
 		this.weight = uSpace.getWeight(this.number);
 		this.type   = issue.getType();
+		
+		this.girValues = new ArrayList<GirValue>();
 		
 		switch (this.type) {
 		    case REAL:
@@ -43,9 +47,27 @@ public class GirIssue {
 		    case DISCRETE:
 		        IssueDiscrete issueDiscrete = (IssueDiscrete) issue;
 		        List<ValueDiscrete> allValues = issueDiscrete.getValues();
+		        
+		        for(ValueDiscrete valueDiscrete : allValues) {
+		        	girValues.add(new GirValue(valueDiscrete.getValue()));
+		        }
+		}
+	}
 	
-		        // accessing to the old value
-		        // ValueDiscrete valueDiscrete = (ValueDiscrete) bid.getValue(issueNumber);
+	protected void addValue(Value value, int action) {
+		switch (this.type) {
+		    case REAL:
+		        
+		    case INTEGER:
+	
+		    case DISCRETE:
+		        ValueDiscrete valueDiscrete = (ValueDiscrete)value;
+		        String valueString = valueDiscrete.getValue();
+		        
+		        for(GirValue girValue : this.girValues) {
+		        	if(girValue.valueDiscrete == valueString) {
+		        	}
+		        }
 		}
 	}
 	

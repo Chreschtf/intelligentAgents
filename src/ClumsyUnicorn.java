@@ -170,24 +170,16 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
     	for (Issue issue : issues) {
     		this.girIssues.add(new GirIssue(issue, uSpace));
     	}
-    	this.girIssues.sort(GirIssue.weightComparator);
-    	for(GirIssue girIssue : girIssues) {
-    		System.out.println("Number: " + girIssue.number + " Weight: " + girIssue.weight);
-    	}
-    	this.girIssues.sort(GirIssue.numberComparator);
-    	for(GirIssue girIssue : girIssues) {
-    		System.out.println("Number: " + girIssue.number + " Weight: " + girIssue.weight);
-    	}
     }
     
     private Opponent getOpponent(AgentID sender) {
     	if(this.op1 == null) {
-    		this.op1 = new Opponent(sender);
+    		this.op1 = new Opponent(sender, this.girIssues);
     		return this.op1;
     	} else if (this.op1.agentId == sender) {
     		return this.op1;
     	} else if (this.op2 == null) {
-    		this.op2 = new Opponent(sender);
+    		this.op2 = new Opponent(sender, this.girIssues);
     		return this.op2;
     	} else if (this.op2.agentId == sender) {
     		return this.op2; 
