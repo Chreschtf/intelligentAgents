@@ -31,6 +31,7 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
     private double minUtility;
     private NegotiationInfo info;
     private List<GirIssue> girIssues;
+    private int votes;
     
     @Override
     public void init(NegotiationInfo info) {
@@ -90,6 +91,7 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
         super.receiveMessage(sender, act);
 
         if (act instanceof Offer) { // sender is making an offer
+        	this.votes = 0;
             Offer offer = (Offer) act;
             
             if (this.lastOffer != null) {
@@ -103,6 +105,9 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
             this.lastOffer = offer;
            
         } else if(act instanceof Accept) {
+        	this.op1.print();
+        	this.op2.print();
+        	
         	if(this.lastOffer != null) {
         		this.getOpponent(sender).addAccept(this.lastOffer);
         	}
