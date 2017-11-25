@@ -101,8 +101,11 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
 
             // storing last received offer
             this.lastOffer = offer;
-        } else if(act instanceof Accept && this.lastOffer != null) {
-        	this.getOpponent(sender).addAccept(this.lastOffer);
+           
+        } else if(act instanceof Accept) {
+        	if(this.lastOffer != null) {
+        		this.getOpponent(sender).addAccept(this.lastOffer);
+        	}
         }
     }
 

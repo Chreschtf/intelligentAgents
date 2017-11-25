@@ -37,14 +37,27 @@ public class Opponent {
 	
 	//Add Offer rejected by the agent
 	protected void addReject(Offer offer) {
+		Bid bid = offer.getBid();
+		
 		rejectedOffers.add(offer);
-		rejectedBids.add(offer.getBid());
+		rejectedBids.add(bid);
+		
+		System.out.println(this.agentId);
+		for(GirIssue issue : this.issues) {
+			issue.addValue(bid.getValue(issue.number), -1);
+		}
 	}
 	
 	//Add Offer Made by the agent
 	protected void addOffer(Offer offer) {
+		Bid bid = offer.getBid();
+		
 		offers.add(offer);
-		bids.add(offer.getBid());
+		bids.add(bid);
+		
+		for(GirIssue issue : this.issues) {
+			issue.addValue(bid.getValue(issue.number), 0);
+		}
 	}
 	
 	//Add Offer Accepted by the agent
@@ -54,8 +67,9 @@ public class Opponent {
 		acceptedOffers.add(offer);
 		acceptedBids.add(bid);
 		
+		System.out.println(this.agentId);
 		for(GirIssue issue : this.issues) {
-			bid.getValue(issue.number);
+			issue.addValue(bid.getValue(issue.number), 1);
 		}
 	}
 }

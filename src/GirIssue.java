@@ -65,8 +65,17 @@ public class GirIssue {
 		        String valueString = valueDiscrete.getValue();
 		        
 		        for(GirValue girValue : this.girValues) {
+		        	System.out.println(girValue.valueDiscrete + " " + "Action " + action);
+		        	
 		        	if(girValue.valueDiscrete == valueString) {
-		        	}
+		        		if(action >= 0) {
+		        			System.out.println(girValue.valueDiscrete + "Accepted");
+		        			girValue.accepted++;
+		        		}else {
+		        			System.out.println(girValue.valueDiscrete + "Rejected");
+		        			girValue.rejected++;
+		        		}
+		        	}	
 		        }
 		}
 	}
