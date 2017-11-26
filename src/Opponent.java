@@ -72,4 +72,14 @@ public class Opponent {
 			issue.addValue(bid.getValue(issue.number), 1);
 		}
 	}
+	
+	protected void print() {
+		System.out.println(this.agentId);
+		for(GirIssue issue : issues) {
+			for(GirValue value : issue.girValues) {
+				System.out.println(value.toString());
+			}
+		}
+		System.out.println(" ");
+	}
 }

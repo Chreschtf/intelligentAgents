@@ -15,4 +15,9 @@ class GirValue {
 	protected GirValue(int value){
 		this.valueInt = value;
 	}
+
+	@Override
+	public String toString() {
+		return "GirValue [valueDiscrete=" + valueDiscrete + ", accepted=" + accepted + ", rejected=" + rejected + "]";
+	}
 }

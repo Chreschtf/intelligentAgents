@@ -28,17 +28,17 @@ public class GirIssue {
 		
 		switch (this.type) {
 		    case REAL:
-		        IssueReal issueReal = (IssueReal) issue;
-		        double upperRealBound = issueReal.getUpperBound();
-		        double lowerRealBound = issueReal.getLowerBound();
+//		        IssueReal issueReal = (IssueReal) issue;
+//		        double upperRealBound = issueReal.getUpperBound();
+//		        double lowerRealBound = issueReal.getLowerBound();
 	
 		        // accessing to the old value
 		        // ValueReal valueReal = (ValueReal) bid.getValue(issueNumber);
 		        
 		    case INTEGER:
-		        IssueInteger issueInteger = (IssueInteger) issue;
-		        int upperIntegerBound = issueInteger.getUpperBound();
-		        int lowerIntegerBound = issueInteger.getLowerBound();
+//		        IssueInteger issueInteger = (IssueInteger) issue;
+//		        int upperIntegerBound = issueInteger.getUpperBound();
+//		        int lowerIntegerBound = issueInteger.getLowerBound();
 	
 		        // accessing to the old value
 		        // ValueInteger valueInteger = (ValueInteger) bid.getValue(issueNumber);
@@ -51,6 +51,7 @@ public class GirIssue {
 		        for(ValueDiscrete valueDiscrete : allValues) {
 		        	girValues.add(new GirValue(valueDiscrete.getValue()));
 		        }
+		    default:
 		}
 	}
 	
@@ -65,17 +66,13 @@ public class GirIssue {
 		        String valueString = valueDiscrete.getValue();
 		        
 		        for(GirValue girValue : this.girValues) {
-		        	System.out.println(girValue.valueDiscrete + " " + "Action " + action);
-		        	
-		        	if(girValue.valueDiscrete == valueString) {
+		        	if(girValue.valueDiscrete.equals(valueString)) {
 		        		if(action >= 0) {
-		        			System.out.println(girValue.valueDiscrete + "Accepted");
 		        			girValue.accepted++;
 		        		}else {
-		        			System.out.println(girValue.valueDiscrete + "Rejected");
 		        			girValue.rejected++;
 		        		}
-		        	}	
+		        	}
 		        }
 		}
 	}
