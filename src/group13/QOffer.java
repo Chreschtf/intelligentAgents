@@ -1,3 +1,4 @@
+package group13;
 import negotiator.Bid;
 
 public class QOffer {

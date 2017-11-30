@@ -1,3 +1,4 @@
+package group13;
 import negotiator.AgentID;
 import negotiator.Bid;
 import negotiator.actions.Accept;
@@ -21,8 +22,8 @@ import java.util.PriorityQueue;
 
 import static java.lang.Math.min;
 
-public class ClumsyUnicorn extends AbstractNegotiationParty {
-    private final String description = "Clumsy Unicorn";
+public class Agent13 extends AbstractNegotiationParty {
+    private final String description = "Agent13";
 
     private Bid myLastOffer;
     private ArrayList<Offer> receivedOffers;
@@ -143,7 +144,6 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
                     return new Accept(this.getPartyId(), this.lastOffer.getBid());
                 }
             }catch (Exception e) {
-
                 e.printStackTrace();
             }
          

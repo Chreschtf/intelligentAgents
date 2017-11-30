@@ -1,3 +1,4 @@
+package group13;
 import java.util.Comparator;
 
 public class QComparator implements Comparator<QOffer> {
