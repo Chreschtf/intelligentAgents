@@ -3,6 +3,8 @@ import negotiator.Bid;
 import negotiator.actions.Accept;
 import negotiator.actions.Action;
 import negotiator.actions.Offer;
+import negotiator.bidding.BidDetails;
+import negotiator.boaframework.SortedOutcomeSpace;
 import negotiator.issue.Issue;
 import negotiator.issue.IssueDiscrete;
 import negotiator.parties.AbstractNegotiationParty;
@@ -10,11 +12,14 @@ import negotiator.parties.NegotiationInfo;
 import negotiator.utility.AbstractUtilitySpace;
 import negotiator.utility.AdditiveUtilitySpace;
 import negotiator.utility.EvaluatorDiscrete;
+import negotiator.BidIterator;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.PriorityQueue;
+
+import static java.lang.Math.min;
 
 public class ClumsyUnicorn extends AbstractNegotiationParty {
     private final String description = "Clumsy Unicorn";
@@ -29,15 +34,38 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
     private double minUtility;
     private NegotiationInfo info;
     private List<GirIssue> girIssues;
-    private List<GirIssue> clumsyIssues;
-    
+    private int votes;
+    private PriorityQueue<QOffer> qValues;
+    private PriorityQueue<QOffer> qValuesNotConsideredYet;
+    private QOffer myLastQOffer;
+    private boolean offerMade;
+    private boolean lastOfferAcceptedBySucceedingAgent;
     private double epsilon = 0.4;
     private double waitPhase = 0.1;
+    private double alpha = 0.1;
+    private double gamma = 0.9;
+    private double rewardReject = -2;
+    private double rewardAcceptOnce = -1;
+
     
     @Override
     public void init(NegotiationInfo info) {
         super.init(info);
         receivedOffers = new ArrayList<Offer>() ;
+        BidIterator bidIterator = new BidIterator(this.utilitySpace.getDomain());
+        Comparator<QOffer> comparator = new QComparator();
+        qValues = new PriorityQueue<QOffer>(comparator);
+        qValuesNotConsideredYet = new PriorityQueue<QOffer>(comparator);
+
+
+        while (bidIterator.hasNext()) {
+            Bid bid = bidIterator.next();
+            QOffer tmpQoffer = new QOffer(bid,this.getUtility(bid),this.getUtility(bid),alpha,gamma);
+            qValuesNotConsideredYet.add(tmpQoffer);
+        }
+
+        QOffer qtemp= qValuesNotConsideredYet.poll();
+        qValues.add(qtemp);
 
         try {
             Bid minBid = this.utilitySpace.getMinUtilityBid();
@@ -50,6 +78,9 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
         }
         this.info = info;
         this.mapDomain();
+
+        offerMade=false;
+
     }
 
     /**
@@ -78,19 +109,53 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
 //        	this.op2.print2();
         }
         
-        if (time >= 0.9) {
+        /*if (time >= 0.9) {
         	return new Accept(this.getPartyId(),this.lastOffer.getBid());
         }
         
         double treshold = this.calcUtilityTreshold();
-        
+
         if (this.lastOffer != null 
         	&& this.utilitySpace.getUtility(this.lastOffer.getBid()) > treshold) { 
             return new Accept(this.getPartyId(), this.lastOffer.getBid());
         } else {
         	this.lastOffer = new Offer(this.getPartyId(), this.generateRandomBidWithTreshold(treshold));
         	return this.lastOffer;
+        }*/
+        if (time<0.9){
+            this.addQvalues();
         }
+
+        //System.out.println(this.qValues.peek().getUtility());
+        if (this.myLastQOffer!=null){
+            if (lastOfferAcceptedBySucceedingAgent)
+                myLastQOffer.updateQvalue(rewardAcceptOnce,this.qValues.peek().getQvalue());
+            else
+                myLastQOffer.updateQvalue(rewardReject,this.qValues.peek().getQvalue());
+        }
+
+        if (this.lastOffer!=null && this.myLastQOffer!=null ){
+            try{
+                double lastOfferUtility = this.getUtility(lastOffer.getBid());
+                if (this.getUtility(lastOffer.getBid()) >=  this.myLastQOffer.getUtility()
+                        && lastOfferUtility >= this.qValues.peek().getUtility()) {
+                    this.qValues.add(myLastQOffer);
+                    return new Accept(this.getPartyId(), this.lastOffer.getBid());
+                }
+            }catch (Exception e) {
+
+                e.printStackTrace();
+            }
+         
+        }
+        
+        QOffer myNextQOffer = this.qValues.poll();
+        offerMade=true;
+        this.lastOffer = new Offer(this.getPartyId(),myNextQOffer.getBid());
+        if (myLastQOffer!=null)
+            this.qValues.add(myLastQOffer);
+        myLastQOffer=myNextQOffer;
+        return this.lastOffer;
     }
 
     /**
@@ -103,9 +168,14 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
         super.receiveMessage(sender, act);
 
         if (act instanceof Offer) { // sender is making an offer
+
             Offer offer = (Offer) act;
             
             if (this.lastOffer != null) {
+                if (offerMade){
+                    offerMade=false;
+                    lastOfferAcceptedBySucceedingAgent=false;
+                }
             	this.getOpponent(sender).addReject(this.lastOffer);
             }
             this.getOpponent(sender).addOffer(offer);
@@ -116,6 +186,14 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
             this.lastOffer = offer;
            
         } else if(act instanceof Accept) {
+
+            if (offerMade) {
+                lastOfferAcceptedBySucceedingAgent=true;
+                offerMade=false;
+            }
+        	//this.op1.print();
+        	//this.op2.print();
+        	
         	if(this.lastOffer != null) {
         		this.getOpponent(sender).addAccept(this.lastOffer);
         	}
@@ -140,12 +218,9 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
         return null;
     }
 
-//    public double getOfferUtility(Bid bid){
-//        return this.utilitySpace.getUtility(bid);
-//    }
     
     public Bid generateRandomBidWithTreshold(double utilityThreshold) {
-    	if(utilityThreshold>=this.maxUtility) {
+    	if(utilityThreshold>this.maxUtility) {
     		return this.getMaxUtilityBid();
     	}
     	
@@ -202,5 +277,17 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
     		return this.op2; 
     	}
     	return this.op1;
+    }
+
+    private void addQvalues(){
+        double threshold = min(this.calcUtilityTreshold(),0.9);
+        try {
+            while (qValuesNotConsideredYet.size() != 0 && qValuesNotConsideredYet.peek().getUtility() >= threshold) {
+                QOffer qtemp = qValuesNotConsideredYet.poll();
+                qValues.add(qtemp);
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
