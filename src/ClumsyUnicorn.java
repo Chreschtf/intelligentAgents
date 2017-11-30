@@ -19,11 +19,9 @@ import java.util.PriorityQueue;
 public class ClumsyUnicorn extends AbstractNegotiationParty {
     private final String description = "Clumsy Unicorn";
 
-//    private Bid lastReceivedOffer; // offer on the table
     private Bid myLastOffer;
     private ArrayList<Offer> receivedOffers;
     
-//    private double utilityThreshold;
     private Opponent op1;
     private Opponent op2;
     private Offer lastOffer;
@@ -31,7 +29,10 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
     private double minUtility;
     private NegotiationInfo info;
     private List<GirIssue> girIssues;
-    private int votes;
+    private List<GirIssue> clumsyIssues;
+    
+    private double epsilon = 0.4;
+    private double waitPhase = 0.1;
     
     @Override
     public void init(NegotiationInfo info) {
@@ -66,6 +67,17 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
         // The time is normalized, so agents need not be
         // concerned with the actual internal clock.
         
+        if(op1!=null) {
+//        	this.op1.print();
+        	this.op1.calculateRates();
+//        	this.op1.print2();
+        }
+        if(op2!=null) {
+//        	this.op1.print();
+        	this.op2.calculateRates();
+//        	this.op2.print2();
+        }
+        
         if (time >= 0.9) {
         	return new Accept(this.getPartyId(),this.lastOffer.getBid());
         }
@@ -91,7 +103,6 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
         super.receiveMessage(sender, act);
 
         if (act instanceof Offer) { // sender is making an offer
-        	this.votes = 0;
             Offer offer = (Offer) act;
             
             if (this.lastOffer != null) {
@@ -105,9 +116,6 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
             this.lastOffer = offer;
            
         } else if(act instanceof Accept) {
-        	this.op1.print();
-        	this.op2.print();
-        	
         	if(this.lastOffer != null) {
         		this.getOpponent(sender).addAccept(this.lastOffer);
         	}
@@ -137,7 +145,7 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
 //    }
     
     public Bid generateRandomBidWithTreshold(double utilityThreshold) {
-    	if(utilityThreshold>this.maxUtility) {
+    	if(utilityThreshold>=this.maxUtility) {
     		return this.getMaxUtilityBid();
     	}
     	
@@ -156,14 +164,13 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
     }
     
     private double timePressure(double time) {
-    	double ep = 0.4;
-    	return 1 - Math.pow(time, (1/ep));
+    	if (time <= this.waitPhase) {return 1;}
+    	return 1 - Math.pow(time, (1/this.epsilon));
     }
     
     private double calcUtilityTreshold(){
     	double tp = this.timePressure(getTimeLine().getTime());
     	double treshold = (this.maxUtility * tp);
-        System.out.println("Treshold:" + treshold);
     	return treshold; 
     }
     
@@ -175,8 +182,10 @@ public class ClumsyUnicorn extends AbstractNegotiationParty {
     	
     	List<Issue>issues = uSpace.getDomain().getIssues();
     	
+    	double w0 = 1/issues.size();
+    	
     	for (Issue issue : issues) {
-    		this.girIssues.add(new GirIssue(issue, uSpace));
+    		this.girIssues.add(new GirIssue(issue, uSpace, w0));
     	}
     }
     

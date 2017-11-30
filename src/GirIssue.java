@@ -18,11 +18,13 @@ public class GirIssue {
 	protected double weight;
 	protected ISSUETYPE type;
 	protected List<GirValue> girValues;
+	protected String name;
 	
-	protected GirIssue(Issue issue, AdditiveUtilitySpace uSpace){
+	public GirIssue(Issue issue, AdditiveUtilitySpace uSpace, double w0){
 		this.number = issue.getNumber();
-		this.weight = uSpace.getWeight(this.number);
+		this.weight = w0;
 		this.type   = issue.getType();
+		this.name   = issue.getName();
 		
 		this.girValues = new ArrayList<GirValue>();
 		
@@ -55,7 +57,7 @@ public class GirIssue {
 		}
 	}
 	
-	protected void addValue(Value value, int action) {
+	public void addValue(Value value, int action) {
 		switch (this.type) {
 		    case REAL:
 		        
@@ -67,26 +69,32 @@ public class GirIssue {
 		        
 		        for(GirValue girValue : this.girValues) {
 		        	if(girValue.valueDiscrete.equals(valueString)) {
-		        		if(action >= 0) {
-		        			girValue.accepted++;
-		        		}else {
-		        			girValue.rejected++;
-		        		}
+		        		girValue.addValue(action);
 		        	}
 		        }
+		default:
+			break;
 		}
 	}
 	
-	protected static Comparator<GirIssue> weightComparator = new Comparator<GirIssue>() {
+	public void sortRates(){
+		this.girValues.sort(GirValue.rateComparator);
+	}
+	
+	public static Comparator<GirIssue> weightComparator = new Comparator<GirIssue>() {
 		public int compare(GirIssue i1, GirIssue i2) {
 		   return Double.compare(i2.weight, i1.weight);
 	   }
 	};
 	
-	protected static Comparator<GirIssue> numberComparator = new Comparator<GirIssue>() {
+	public static Comparator<GirIssue> numberComparator = new Comparator<GirIssue>() {
 		public int compare(GirIssue i1, GirIssue i2) {
 		   return Integer.compare(i1.number, i2.number);
 	   }
 	};
 
+	@Override
+	public String toString() {
+		return "GirIssue [name=" + name + ", number=" + number + ", weight=" + weight + "]";
+	}
 }

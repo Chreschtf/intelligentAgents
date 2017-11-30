@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import negotiator.actions.Offer;
-import negotiator.issue.Issue;
+//import negotiator.issue.Issue;
 import negotiator.AgentID;
 import negotiator.Bid;
 
@@ -42,7 +42,6 @@ public class Opponent {
 		rejectedOffers.add(offer);
 		rejectedBids.add(bid);
 		
-		System.out.println(this.agentId);
 		for(GirIssue issue : this.issues) {
 			issue.addValue(bid.getValue(issue.number), -1);
 		}
@@ -67,10 +66,32 @@ public class Opponent {
 		acceptedOffers.add(offer);
 		acceptedBids.add(bid);
 		
-		System.out.println(this.agentId);
 		for(GirIssue issue : this.issues) {
 			issue.addValue(bid.getValue(issue.number), 1);
 		}
+	}
+	
+	protected void calculateRates() {
+		int accepted = this.acceptedBids.size();
+		int made     = this.bids.size();
+		int rejected = this.rejectedBids.size();
+		int total    = (accepted + made + rejected);
+		
+		if(total == 0) {return;}
+		
+		for(GirIssue issue : this.issues) {
+			for(GirValue value : issue.girValues) {
+				value.rate = (double) (value.accepted - value.rejected)/total;
+			}
+			issue.girValues.sort(GirValue.rateComparator);
+			issue.weight = issue.girValues.get(0).rate;
+		}
+		System.out.println(this.agentId);
+		this.issues.sort(GirIssue.weightComparator);
+    	for(GirIssue girIssue : this.issues) {
+    		System.out.print("Name:" + girIssue.name + ",Weight: " + girIssue.weight + "||");
+    	}
+    	System.out.println(" ");
 	}
 	
 	protected void print() {
@@ -79,6 +100,14 @@ public class Opponent {
 			for(GirValue value : issue.girValues) {
 				System.out.println(value.toString());
 			}
+		}
+		System.out.println(" ");
+	}
+	
+	protected void print2() {
+		System.out.println(this.agentId);
+		for(GirIssue issue : issues) {
+			System.out.println(issue.name + ": " +issue.weight);
 		}
 		System.out.println(" ");
 	}
