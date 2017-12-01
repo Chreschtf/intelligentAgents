@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import negotiator.actions.Offer;
-//import negotiator.issue.Issue;
 import negotiator.AgentID;
 import negotiator.Bid;
 

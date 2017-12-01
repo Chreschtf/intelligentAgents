@@ -13,6 +13,7 @@ class GirValue {
 	protected int offered;
 	protected double probability;
 	protected double rate;
+	protected double freq;
 	
 	protected GirValue(String value){
 		this.valueDiscrete = value;

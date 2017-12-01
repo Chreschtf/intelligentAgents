@@ -28,14 +28,16 @@ public class Agent13 extends AbstractNegotiationParty {
     private Bid myLastOffer;
     private ArrayList<Offer> receivedOffers;
     
+    protected static Opponent model;
     private Opponent op1;
     private Opponent op2;
+    
     private Offer lastOffer;
     private double maxUtility;
     private double minUtility;
     private NegotiationInfo info;
-    private List<GirIssue> girIssues;
-    private int votes;
+ 
+    private List<GirIssue> issues;
     private PriorityQueue<QOffer> qValues;
     private PriorityQueue<QOffer> qValuesNotConsideredYet;
     private QOffer myLastQOffer;
@@ -81,7 +83,6 @@ public class Agent13 extends AbstractNegotiationParty {
         this.mapDomain();
 
         offerMade=false;
-
     }
 
     /**
@@ -96,33 +97,14 @@ public class Agent13 extends AbstractNegotiationParty {
         // According to Stacked Alternating Offers Protocol list includes
         // Accept, Offer and EndNegotiation actions only.
         double time = getTimeLine().getTime(); // Gets the time, running from t = 0 (start) to t = 1 (deadline).
-        // The time is normalized, so agents need not be
-        // concerned with the actual internal clock.
         
         if(op1!=null) {
-//        	this.op1.print();
         	this.op1.calculateRates();
-//        	this.op1.print2();
         }
         if(op2!=null) {
-//        	this.op1.print();
         	this.op2.calculateRates();
-//        	this.op2.print2();
         }
         
-        /*if (time >= 0.9) {
-        	return new Accept(this.getPartyId(),this.lastOffer.getBid());
-        }
-        
-        double treshold = this.calcUtilityTreshold();
-
-        if (this.lastOffer != null 
-        	&& this.utilitySpace.getUtility(this.lastOffer.getBid()) > treshold) { 
-            return new Accept(this.getPartyId(), this.lastOffer.getBid());
-        } else {
-        	this.lastOffer = new Offer(this.getPartyId(), this.generateRandomBidWithTreshold(treshold));
-        	return this.lastOffer;
-        }*/
         if (time<0.9){
             this.addQvalues();
         }
@@ -145,8 +127,7 @@ public class Agent13 extends AbstractNegotiationParty {
                 }
             }catch (Exception e) {
                 e.printStackTrace();
-            }
-         
+            } 
         }
         
         QOffer myNextQOffer = this.qValues.poll();
@@ -191,8 +172,6 @@ public class Agent13 extends AbstractNegotiationParty {
                 lastOfferAcceptedBySucceedingAgent=true;
                 offerMade=false;
             }
-        	//this.op1.print();
-        	//this.op2.print();
         	
         	if(this.lastOffer != null) {
         		this.getOpponent(sender).addAccept(this.lastOffer);
@@ -250,28 +229,34 @@ public class Agent13 extends AbstractNegotiationParty {
     }
     
     private void mapDomain() {
-    	this.girIssues = new ArrayList<GirIssue>();
+    	this.model.issues = new ArrayList<GirIssue>();
     	
     	AbstractUtilitySpace utilitySpace = this.info.getUtilitySpace();
     	AdditiveUtilitySpace uSpace = (AdditiveUtilitySpace) utilitySpace;
     	
     	List<Issue>issues = uSpace.getDomain().getIssues();
     	
-    	double w0 = 1/issues.size();
+    	double w0 = 1/issues.size(); //Initial Weights
     	
     	for (Issue issue : issues) {
-    		this.girIssues.add(new GirIssue(issue, uSpace, w0));
+    		this.model.issues.add(new GirIssue(issue, uSpace, w0));
+    	}
+    	
+    	//Get Weights for our agent
+    	this.issues = new ArrayList<GirIssue>(this.model.issues);
+    	for (GirIssue issue : this.issues) {
+    		uSpace.getWeight(issue.number);
     	}
     }
     
     private Opponent getOpponent(AgentID sender) {
     	if(this.op1 == null) {
-    		this.op1 = new Opponent(sender, this.girIssues);
+    		this.op1 = new Opponent(sender, this.model.issues);
     		return this.op1;
     	} else if (this.op1.agentId == sender) {
     		return this.op1;
     	} else if (this.op2 == null) {
-    		this.op2 = new Opponent(sender, this.girIssues);
+    		this.op2 = new Opponent(sender, this.model.issues);
     		return this.op2;
     	} else if (this.op2.agentId == sender) {
     		return this.op2; 
