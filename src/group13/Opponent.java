@@ -3,6 +3,10 @@ package group13;
 import java.util.ArrayList;
 import java.util.List;
 import negotiator.actions.Offer;
+//import negotiator.issue.Issue;
+//import negotiator.parties.NegotiationInfo;
+//import negotiator.utility.AbstractUtilitySpace;
+//import negotiator.utility.AdditiveUtilitySpace;
 import negotiator.AgentID;
 import negotiator.Bid;
 
@@ -21,6 +25,14 @@ public class Opponent {
 	protected List<GirIssue> issues;
 	
 	protected Window w0;
+	
+	protected Opponent() {				
+		bids         = new ArrayList<Bid>();
+		rejectedBids = new ArrayList<Bid>();
+		acceptedBids = new ArrayList<Bid>();
+		
+		this.issues  = new ArrayList<GirIssue>();
+	}
 	
 	protected Opponent(AgentID id, List<GirIssue> issues) {
 		this.agentId = id;

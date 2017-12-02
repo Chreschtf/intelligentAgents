@@ -229,7 +229,7 @@ public class Agent13 extends AbstractNegotiationParty {
     }
     
     private void mapDomain() {
-    	this.model.issues = new ArrayList<GirIssue>();
+    	Agent13.model = new Opponent();
     	
     	AbstractUtilitySpace utilitySpace = this.info.getUtilitySpace();
     	AdditiveUtilitySpace uSpace = (AdditiveUtilitySpace) utilitySpace;
@@ -239,11 +239,11 @@ public class Agent13 extends AbstractNegotiationParty {
     	double w0 = 1/issues.size(); //Initial Weights
     	
     	for (Issue issue : issues) {
-    		this.model.issues.add(new GirIssue(issue, uSpace, w0));
+    		Agent13.model.issues.add(new GirIssue(issue, uSpace, w0));
     	}
     	
     	//Get Weights for our agent
-    	this.issues = new ArrayList<GirIssue>(this.model.issues);
+    	this.issues = new ArrayList<GirIssue>(Agent13.model.issues);
     	for (GirIssue issue : this.issues) {
     		issue.weight = uSpace.getWeight(issue.number);
     	}
@@ -251,12 +251,12 @@ public class Agent13 extends AbstractNegotiationParty {
     
     private Opponent getOpponent(AgentID sender) {
     	if(this.op1 == null) {
-    		this.op1 = new Opponent(sender, this.model.issues);
+    		this.op1 = new Opponent(sender, Agent13.model.issues);
     		return this.op1;
     	} else if (this.op1.agentId == sender) {
     		return this.op1;
     	} else if (this.op2 == null) {
-    		this.op2 = new Opponent(sender, this.model.issues);
+    		this.op2 = new Opponent(sender, Agent13.model.issues);
     		return this.op2;
     	} else if (this.op2.agentId == sender) {
     		return this.op2; 
