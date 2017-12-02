@@ -2,9 +2,6 @@ package group13;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.math.util.MathUtils;
-
 import negotiator.actions.Offer;
 import negotiator.AgentID;
 import negotiator.Bid;
@@ -30,22 +27,27 @@ public class Opponent {
 //		rejectedOffers = new ArrayList<Offer>();
 //		acceptedOffers = new ArrayList<Offer>();
 		
-		bids = new ArrayList<Bid>();
+		bids         = new ArrayList<Bid>();
 		rejectedBids = new ArrayList<Bid>();
 		acceptedBids = new ArrayList<Bid>();
 		
-		this.issues = new ArrayList<GirIssue>(issues);
+		this.issues  = new ArrayList<GirIssue>(issues);
 	}
 	
-	//Add Offer Made by the agent
+	//Add Action by the Opponent
 	protected void addOffer(Offer offer, int action, double time) {
 		Bid bid = offer.getBid();
+		
+		boolean window = false;
 		
 		switch (action) {
 		    case -1:
 		    	rejectedBids.add(bid);
+		    
 		    case 0:
+		    	int total = bids.size();
 		    	bids.add(bid);
+		    	if((total % Window.size) == 0){window = true;}
 		    case 1:
 		    	acceptedBids.add(bid);
 		    default:
@@ -53,6 +55,10 @@ public class Opponent {
 		
 		for(GirIssue issue : this.issues) {
 			issue.addValue(bid.getValue(issue.number), action);
+		}
+		
+		if(window) {
+//			Window w1 = new Window()
 		}
 	}
 	

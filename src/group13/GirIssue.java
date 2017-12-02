@@ -1,16 +1,11 @@
 package group13;
-import negotiator.Bid;
 import negotiator.issue.ISSUETYPE;
 import negotiator.issue.Issue;
 import negotiator.issue.IssueDiscrete;
-import negotiator.issue.IssueInteger;
-import negotiator.issue.IssueReal;
 import negotiator.issue.Value;
 import negotiator.issue.ValueDiscrete;
-import negotiator.issue.ValueReal;
-import negotiator.issue.ValueInteger;
 import negotiator.utility.AdditiveUtilitySpace;
-import negotiator.utility.EvaluatorDiscrete;
+//import negotiator.utility.EvaluatorDiscrete;
 import java.util.Comparator;
 import java.util.List;
 
@@ -65,9 +60,25 @@ public class GirIssue {
 		        		girValue.addValue(action);
 		        	}
 		        }
-		default:
-			break;
+		    default:
 		}
+	}
+	
+	protected void calcIV(int total) {
+		double max = 0;
+		
+		//IV
+		for(GirValue girValue : this.girValues) {
+        	girValue.vi = (double)(1 + girValue.accepted)/(1 + total);
+        	if(girValue.vi > max) {
+        		max = girValue.vi;
+        	}
+        }
+		
+		//Normalise by the max
+		for(GirValue girValue : this.girValues) {
+        	girValue.vi = girValue.vi / max;
+        }
 	}
 	
 	protected double[] getFreqs() {
@@ -114,11 +125,7 @@ public class GirIssue {
         }
 		return utility;
 	}
-	
-//	public void sortRates(){
-//		this.girValues.sort(GirValue.rateComparator);
-//	}
-	
+		
 	public static Comparator<GirIssue> weightComparator = new Comparator<GirIssue>() {
 		public int compare(GirIssue i1, GirIssue i2) {
 		   return Double.compare(i2.weight, i1.weight);
