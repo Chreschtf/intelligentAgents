@@ -27,14 +27,23 @@ public class Window {
 		for(GirIssue issue : this.issues) {
 			for(GirValue value : issue.girValues) {
 				value.freq = (double) (1 + value.accepted)/(1 + Window.size);
-				value.freq = this.normalize(value.freq);
 			}
+			issue.normaliseValues();
 		}
 	}
 	
 	protected void compareWindows(Window w0) {
+		double pval;
+		boolean update;
+		
 		for(int i = 0; i<this.issues.size(); i++) {
-			double pval = this.chiSquareTest(w0.issues.get(i).getFreqs(), this.issues.get(i).getFreqs());
+			update = false;
+			pval = this.chiSquareTest(w0.issues.get(i).getFreqs(), this.issues.get(i).getFreqs());
+			if(pval>0.5) { //no issue change, weight is important
+				update = true;
+			}else {
+				
+			}
 		}
 	}
 	

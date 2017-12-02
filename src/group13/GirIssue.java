@@ -12,6 +12,9 @@ import negotiator.utility.AdditiveUtilitySpace;
 import negotiator.utility.EvaluatorDiscrete;
 import java.util.Comparator;
 import java.util.List;
+
+import org.apache.commons.math.util.MathUtils;
+
 import java.util.ArrayList;
 
 public class GirIssue {
@@ -80,11 +83,20 @@ public class GirIssue {
 	
 	protected double[] getFreqs() {
 		double[] freqs = new double[this.girValues.size()];
-		int i = 0;
-		for(GirValue girValue : this.girValues) {
-        	freqs[i] = girValue.freq;
+		for(int i = 0; i < this.girValues.size(); i++) {
+        	freqs[i] = girValues.get(i).freq;
         }
 		return freqs;
+	}
+	
+	protected void normaliseValues() {
+		double[] freqs = this.getFreqs();
+		
+		freqs = MathUtils.normalizeArray(freqs,(double)1);
+		
+		for(int i = 0; i < this.girValues.size(); i++) {
+			girValues.get(i).freq = freqs[i];
+        }
 	}
 	
 	public void sortRates(){
