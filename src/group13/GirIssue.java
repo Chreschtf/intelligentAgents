@@ -9,8 +9,6 @@ import negotiator.utility.AdditiveUtilitySpace;
 import java.util.Comparator;
 import java.util.List;
 
-import org.apache.commons.math.util.MathUtils;
-
 import java.util.ArrayList;
 
 public class GirIssue {
@@ -64,6 +62,26 @@ public class GirIssue {
 		}
 	}
 	
+	protected GirValue getValue(Value value) {
+		switch (this.type) {
+		    case REAL:
+		        
+		    case INTEGER:
+	
+		    case DISCRETE:
+		        ValueDiscrete valueDiscrete = (ValueDiscrete)value;
+		        String valueString = valueDiscrete.getValue();
+		        
+		        for(GirValue girValue : this.girValues) {
+		        	if(girValue.valueDiscrete.equals(valueString)) {
+		        		return girValue;
+		        	}
+		        }
+		    default:
+		    	return new GirValue("Fail"); //Just for compiling sake
+		}
+	}
+	
 	protected void calcIV(int total) {
 		double max = 0;
 		
@@ -81,36 +99,27 @@ public class GirIssue {
         }
 	}
 	
+	protected void calcFrequencies(int total) {
+		double sum = 0;
+		
+		//distribution frequency
+		for(GirValue value : this.girValues) {
+			value.freq = (double) (1 + value.accepted)/(1 + total);
+			sum = sum + value.freq;
+		}
+		
+		//normalise to sum 1
+		for(GirValue value : this.girValues) {
+			value.freq = value.freq/sum;
+		}
+	}
+	
 	protected double[] getFreqs() {
 		double[] freqs = new double[this.girValues.size()];
 		for(int i = 0; i < this.girValues.size(); i++) {
         	freqs[i] = girValues.get(i).freq;
         }
 		return freqs;
-	}
-	
-	protected void normaliseValues() {
-		double[] freqs = this.getFreqs();
-		
-		freqs = MathUtils.normalizeArray(freqs,(double)1);
-		
-		for(int i = 0; i < this.girValues.size(); i++) {
-			girValues.get(i).freq = freqs[i];
-        }
-	}
-	
-	protected static void normaliseWeights(List<GirIssue> issues) {
-		double[] weights = new double[issues.size()];
-		
-		for(int i = 0; i < issues.size(); i++) {
-			weights[i] = issues.get(i).weight;
-        }
-		
-		weights = MathUtils.normalizeArray(weights,(double)1);
-		
-		for(int i = 0; i < issues.size(); i++) {
-			issues.get(i).weight = weights[i];
-        }
 	}
 	
 	protected double calcUtility(GirIssue opIssue) {

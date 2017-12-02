@@ -17,7 +17,10 @@ public class Window {
 	protected Window(List<Bid> bids) {
 		this.issues = new ArrayList<GirIssue>(Agent13.model.issues);
 		
-		for(Bid bid : bids) {
+		int total = bids.size();
+		List<Bid> windowBids = (bids.subList( (total - Window.size), (total - 1)) );
+		
+		for(Bid bid : windowBids) {
 			for(GirIssue issue : this.issues) {
 				issue.addValue(bid.getValue(issue.number), 0);
 			}
@@ -28,10 +31,7 @@ public class Window {
 	
 	protected void updateFrequencies() {
 		for(GirIssue issue : this.issues) {
-			for(GirValue value : issue.girValues) {
-				value.freq = (double) (1 + value.accepted)/(1 + Window.size);
-			}
-			issue.normaliseValues();
+			issue.calcFrequencies(Window.size);
 		}
 	}
 	
@@ -40,7 +40,6 @@ public class Window {
 		boolean update;
 		int updates = 0;
 		
-//		List<GirIssue> opIssues = new ArrayList<GirIssue>(op.issues);
 		op.issues.sort(GirIssue.numberComparator);
 		
 		GirIssue i0;
@@ -70,7 +69,7 @@ public class Window {
 				updates++;
 			}
 		}//for each issue
-		if(updates > 0) {GirIssue.normaliseWeights(op.issues);}
+		if(updates > 0) {op.normaliseWeights();}
 	}
 	
 	protected double calcDelta(double time) {

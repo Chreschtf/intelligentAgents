@@ -20,6 +20,8 @@ public class Opponent {
 	
 	protected List<GirIssue> issues;
 	
+	protected Window w0;
+	
 	protected Opponent(AgentID id, List<GirIssue> issues) {
 		this.agentId = id;
 		
@@ -45,9 +47,8 @@ public class Opponent {
 		    	rejectedBids.add(bid);
 		    
 		    case 0:
-		    	int total = bids.size();
 		    	bids.add(bid);
-		    	if((total % Window.size) == 0){window = true;}
+		    	if((bids.size() % Window.size) == 0){window = true;}
 		    case 1:
 		    	acceptedBids.add(bid);
 		    default:
@@ -58,36 +59,34 @@ public class Opponent {
 		}
 		
 		if(window) {
-//			Window w1 = new Window()
+			Window w1 = new Window(bids);
+			if(this.w0 != null) {
+				w1.compareWindows(w1, this, time);
+			}
+			this.w0 = w1;
 		}
 	}
 	
-	protected double expectedUtility(Bid bid) {
-		return (double)1;
+	protected void normaliseWeights() {
+		double sum = 0;
+		
+		for(GirIssue issue : this.issues) {
+			sum = sum + issue.weight;
+        }
+		
+		for(GirIssue issue : this.issues) {
+			issue.weight = issue.weight/sum;
+        }
 	}
 	
-//	protected void calculateRates() {
-//		int accepted = this.acceptedBids.size();
-//		int made     = this.bids.size();
-//		int rejected = this.rejectedBids.size();
-//		int total    = (accepted + made + rejected);
-//		
-//		if(total == 0) {return;}
-//		
-//		for(GirIssue issue : this.issues) {
-//			for(GirValue value : issue.girValues) {
-//				value.rate = (double) (value.accepted - value.rejected)/total;
-//			}
-//			issue.girValues.sort(GirValue.rateComparator);
-//			issue.weight = issue.girValues.get(0).rate;
-//		}
-//		System.out.println(this.agentId);
-//		this.issues.sort(GirIssue.weightComparator);
-//    	for(GirIssue girIssue : this.issues) {
-//    		System.out.print("Name:" + girIssue.name + ",Weight: " + girIssue.weight + "||");
-//    	}
-//    	System.out.println(" ");
-//	}
+	protected double expectedUtility(Bid bid) {
+		double utility = 0;
+		for(GirIssue issue : this.issues) {
+			GirValue value = issue.getValue(bid.getValue(issue.number));
+			utility = utility + ( value.vi * issue.weight );
+		}
+		return utility;
+	}
 	
 	protected void print() {
 		System.out.println(this.agentId);
