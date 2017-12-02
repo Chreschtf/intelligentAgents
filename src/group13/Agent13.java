@@ -99,10 +99,10 @@ public class Agent13 extends AbstractNegotiationParty {
         double time = getTimeLine().getTime(); // Gets the time, running from t = 0 (start) to t = 1 (deadline).
         
         if(op1!=null) {
-        	this.op1.calculateRates();
+//        	this.op1.calculateRates();
         }
         if(op2!=null) {
-        	this.op2.calculateRates();
+//        	this.op2.calculateRates();
         }
         
         if (time<0.9){
@@ -157,9 +157,9 @@ public class Agent13 extends AbstractNegotiationParty {
                     offerMade=false;
                     lastOfferAcceptedBySucceedingAgent=false;
                 }
-            	this.getOpponent(sender).addReject(this.lastOffer);
+            	this.getOpponent(sender).addOffer(this.lastOffer, -1, getTimeLine().getTime());
             }
-            this.getOpponent(sender).addOffer(offer);
+            this.getOpponent(sender).addOffer(offer, 0, getTimeLine().getTime());
             
             receivedOffers.add(offer);
 
@@ -174,7 +174,7 @@ public class Agent13 extends AbstractNegotiationParty {
             }
         	
         	if(this.lastOffer != null) {
-        		this.getOpponent(sender).addAccept(this.lastOffer);
+        		this.getOpponent(sender).addOffer(this.lastOffer, 1, getTimeLine().getTime());
         	}
         }
     }
@@ -245,7 +245,7 @@ public class Agent13 extends AbstractNegotiationParty {
     	//Get Weights for our agent
     	this.issues = new ArrayList<GirIssue>(this.model.issues);
     	for (GirIssue issue : this.issues) {
-    		uSpace.getWeight(issue.number);
+    		issue.weight = uSpace.getWeight(issue.number);
     	}
     }
     

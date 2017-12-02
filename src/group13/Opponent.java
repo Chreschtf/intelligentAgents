@@ -3,6 +3,8 @@ package group13;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.math.util.MathUtils;
+
 import negotiator.actions.Offer;
 import negotiator.AgentID;
 import negotiator.Bid;
@@ -24,9 +26,9 @@ public class Opponent {
 	protected Opponent(AgentID id, List<GirIssue> issues) {
 		this.agentId = id;
 		
-		offers = new ArrayList<Offer>();
-		rejectedOffers = new ArrayList<Offer>();
-		acceptedOffers = new ArrayList<Offer>();
+//		offers = new ArrayList<Offer>();
+//		rejectedOffers = new ArrayList<Offer>();
+//		acceptedOffers = new ArrayList<Offer>();
 		
 		bids = new ArrayList<Bid>();
 		rejectedBids = new ArrayList<Bid>();
@@ -35,64 +37,51 @@ public class Opponent {
 		this.issues = new ArrayList<GirIssue>(issues);
 	}
 	
-	//Add Offer rejected by the agent
-	protected void addReject(Offer offer) {
-		Bid bid = offer.getBid();
-		
-		rejectedOffers.add(offer);
-		rejectedBids.add(bid);
-		
-		for(GirIssue issue : this.issues) {
-			issue.addValue(bid.getValue(issue.number), -1);
-		}
-	}
-	
 	//Add Offer Made by the agent
-	protected void addOffer(Offer offer) {
+	protected void addOffer(Offer offer, int action, double time) {
 		Bid bid = offer.getBid();
 		
-		offers.add(offer);
-		bids.add(bid);
+		switch (action) {
+		    case -1:
+		    	rejectedBids.add(bid);
+		    case 0:
+		    	bids.add(bid);
+		    case 1:
+		    	acceptedBids.add(bid);
+		    default:
+		}
 		
 		for(GirIssue issue : this.issues) {
-			issue.addValue(bid.getValue(issue.number), 0);
+			issue.addValue(bid.getValue(issue.number), action);
 		}
 	}
 	
-	//Add Offer Accepted by the agent
-	protected void addAccept(Offer offer) {
-		Bid bid = offer.getBid();
-		
-		acceptedOffers.add(offer);
-		acceptedBids.add(bid);
-		
-		for(GirIssue issue : this.issues) {
-			issue.addValue(bid.getValue(issue.number), 1);
-		}
+	protected double expectedUtility(Bid bid) {
+		return (double)1;
 	}
 	
-	protected void calculateRates() {
-		int accepted = this.acceptedBids.size();
-		int made     = this.bids.size();
-		int rejected = this.rejectedBids.size();
-		int total    = (accepted + made + rejected);
-		
-		if(total == 0) {return;}
-		
-		for(GirIssue issue : this.issues) {
-			for(GirValue value : issue.girValues) {
-				value.rate = (double) (value.accepted - value.rejected)/total;
-			}
-			issue.girValues.sort(GirValue.rateComparator);
-			issue.weight = issue.girValues.get(0).rate;
-		}
-		System.out.println(this.agentId);
-		this.issues.sort(GirIssue.weightComparator);
-    	for(GirIssue girIssue : this.issues) {
-    		System.out.print("Name:" + girIssue.name + ",Weight: " + girIssue.weight + "||");
-    	}
-    	System.out.println(" ");
-	}
+//	protected void calculateRates() {
+//		int accepted = this.acceptedBids.size();
+//		int made     = this.bids.size();
+//		int rejected = this.rejectedBids.size();
+//		int total    = (accepted + made + rejected);
+//		
+//		if(total == 0) {return;}
+//		
+//		for(GirIssue issue : this.issues) {
+//			for(GirValue value : issue.girValues) {
+//				value.rate = (double) (value.accepted - value.rejected)/total;
+//			}
+//			issue.girValues.sort(GirValue.rateComparator);
+//			issue.weight = issue.girValues.get(0).rate;
+//		}
+//		System.out.println(this.agentId);
+//		this.issues.sort(GirIssue.weightComparator);
+//    	for(GirIssue girIssue : this.issues) {
+//    		System.out.print("Name:" + girIssue.name + ",Weight: " + girIssue.weight + "||");
+//    	}
+//    	System.out.println(" ");
+//	}
 	
 	protected void print() {
 		System.out.println(this.agentId);

@@ -1,4 +1,5 @@
 package group13;
+import negotiator.Bid;
 import negotiator.issue.ISSUETYPE;
 import negotiator.issue.Issue;
 import negotiator.issue.IssueDiscrete;
@@ -34,21 +35,8 @@ public class GirIssue {
 		
 		switch (this.type) {
 		    case REAL:
-//		        IssueReal issueReal = (IssueReal) issue;
-//		        double upperRealBound = issueReal.getUpperBound();
-//		        double lowerRealBound = issueReal.getLowerBound();
-	
-		        // accessing to the old value
-		        // ValueReal valueReal = (ValueReal) bid.getValue(issueNumber);
 		        
-		    case INTEGER:
-//		        IssueInteger issueInteger = (IssueInteger) issue;
-//		        int upperIntegerBound = issueInteger.getUpperBound();
-//		        int lowerIntegerBound = issueInteger.getLowerBound();
-	
-		        // accessing to the old value
-		        // ValueInteger valueInteger = (ValueInteger) bid.getValue(issueNumber);
-	
+		    case INTEGER:	
 	
 		    case DISCRETE:
 		        IssueDiscrete issueDiscrete = (IssueDiscrete) issue;
@@ -57,6 +45,7 @@ public class GirIssue {
 		        for(ValueDiscrete valueDiscrete : allValues) {
 		        	girValues.add(new GirValue(valueDiscrete.getValue()));
 		        }
+		        girValues.sort(GirValue.discreteComparator);
 		    default:
 		}
 	}
@@ -99,9 +88,36 @@ public class GirIssue {
         }
 	}
 	
-	public void sortRates(){
-		this.girValues.sort(GirValue.rateComparator);
+	protected static void normaliseWeights(List<GirIssue> issues) {
+		double[] weights = new double[issues.size()];
+		
+		for(int i = 0; i < issues.size(); i++) {
+			weights[i] = issues.get(i).weight;
+        }
+		
+		weights = MathUtils.normalizeArray(weights,(double)1);
+		
+		for(int i = 0; i < issues.size(); i++) {
+			issues.get(i).weight = weights[i];
+        }
 	}
+	
+	protected double calcUtility(GirIssue opIssue) {
+		double utility = 0;
+		double freq;
+		double vi;
+		
+		for(int i = 0; i < this.girValues.size(); i++) {
+			freq = this.girValues.get(i).freq;
+			vi   = opIssue.girValues.get(i).vi;
+			utility = utility + ( freq * vi );
+        }
+		return utility;
+	}
+	
+//	public void sortRates(){
+//		this.girValues.sort(GirValue.rateComparator);
+//	}
 	
 	public static Comparator<GirIssue> weightComparator = new Comparator<GirIssue>() {
 		public int compare(GirIssue i1, GirIssue i2) {

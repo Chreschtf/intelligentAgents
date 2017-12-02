@@ -8,9 +8,12 @@ import java.util.List;
 
 public class Window {
 	protected static int size = 30;
+	protected static double alpha = 0.1;
+	protected static double beta  = 5;
+	
 	protected List<GirIssue> issues;
 	protected static ChiSquareTest chiSqTest = new ChiSquareTest();
-	
+
 	protected Window(List<Bid> bids) {
 		this.issues = new ArrayList<GirIssue>(Agent13.model.issues);
 		
@@ -32,19 +35,46 @@ public class Window {
 		}
 	}
 	
-	protected void compareWindows(Window w0) {
+	protected void compareWindows(Window w0, Opponent op, double time) {
 		double pval;
 		boolean update;
+		int updates = 0;
+		
+//		List<GirIssue> opIssues = new ArrayList<GirIssue>(op.issues);
+		op.issues.sort(GirIssue.numberComparator);
+		
+		GirIssue i0;
+		GirIssue i1;
+		GirIssue io;
+		
+		double delta = this.calcDelta(time);
 		
 		for(int i = 0; i<this.issues.size(); i++) {
 			update = false;
-			pval = this.chiSquareTest(w0.issues.get(i).getFreqs(), this.issues.get(i).getFreqs());
-			if(pval>0.5) { //no issue change, weight is important
+			
+			i0 = w0.issues.get(i);
+			i1 = this.issues.get(i);
+			io = op.issues.get(i);
+			
+			pval = this.chiSquareTest(i0.getFreqs(), i1.getFreqs());
+			
+			if(pval>0.05) { //no issue change, weight is important
 				update = true;
 			}else {
-				
+				if(this.compareIssue(i0, i1, io) > 0){//higher utility, issue went up in importance 
+					update = true;
+				}
 			}
-		}
+			if(update) { 
+				io.weight = io.weight + delta;
+				updates++;
+			}
+		}//for each issue
+		if(updates > 0) {GirIssue.normaliseWeights(op.issues);}
+	}
+	
+	protected double calcDelta(double time) {
+		return Window.alpha * (1 - (Math.pow(time, Window.beta)));
 	}
 	
 	protected double chiSquareTest(double[] f0, double[] f1) {
@@ -56,12 +86,9 @@ public class Window {
 		return chiSqTest.chiSquareTest(f0, f1long);
 	}
 	
-	protected double normalize(double value) {
-		double low  = 0;
-		double high = 1;
-		double normHigh = 1;
-		double normLow  = 0;
-		
-	    return ((value - low) / (high - low)) * (normHigh - normLow) + normLow;
+	protected int compareIssue(GirIssue i0, GirIssue i1, GirIssue io) {
+		double u0 = i0.calcUtility(io);
+		double u1 = i1.calcUtility(io);
+		return Double.compare(u1, u0);
 	}
 }

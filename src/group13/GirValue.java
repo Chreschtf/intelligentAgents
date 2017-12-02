@@ -1,8 +1,6 @@
 package group13;
 import java.util.Comparator;
-
 import negotiator.issue.ISSUETYPE;
-import negotiator.issue.ValueDiscrete;
 
 class GirValue {
 	protected String valueDiscrete;
@@ -14,6 +12,7 @@ class GirValue {
 	protected double probability;
 	protected double rate;
 	protected double freq;
+	protected double vi; //issue valuation
 	
 	protected GirValue(String value){
 		this.valueDiscrete = value;
@@ -25,26 +24,35 @@ class GirValue {
 	
 	protected void addValue(int action) {
 		switch (action) {
-	    case -1:
-	    	this.rejected++;
-	    case 0:
-	    	this.offered++;
-	    case 1:
-	        this.accepted++;
-	    default:
-	    	break;
+		    case -1:
+		    	this.rejected++;
+		    case 0:
+		    	this.offered++;
+		    case 1:
+		        this.accepted++;
+		    default:
 		}
 	}
 	
-	@Override
 	public String toString() {
 		return "GirValue [valueDiscrete=" + valueDiscrete + ", accepted=" + accepted + 
-			   ", rejected=" + rejected + ", rate=" + rate + "]";
+				", rejected=" + rejected + ", rate=" + rate + "]";
 	}
-	
-	public static Comparator<GirValue> rateComparator = new Comparator<GirValue>() {
-		public int compare(GirValue value1, GirValue value2) {
-			return Double.compare(value2.rate, value1.rate);
+
+	public static Comparator<GirValue> discreteComparator = new Comparator<GirValue>() {
+		public int compare(GirValue v1, GirValue v2) {
+
+			String d1 = v1.valueDiscrete.toUpperCase();
+			String d2 = v2.valueDiscrete.toUpperCase();
+
+			//ascending order
+			return d1.compareTo(d2);
 		}
 	};
+	
+//	public static Comparator<GirValue> rateComparator = new Comparator<GirValue>() {
+//		public int compare(GirValue value1, GirValue value2) {
+//			return Double.compare(value2.rate, value1.rate);
+//		}
+//	};
 }
