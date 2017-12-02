@@ -78,6 +78,15 @@ public class GirIssue {
 		}
 	}
 	
+	protected double[] getFreqs() {
+		double[] freqs = new double[this.girValues.size()];
+		int i = 0;
+		for(GirValue girValue : this.girValues) {
+        	freqs[i] = girValue.freq;
+        }
+		return freqs;
+	}
+	
 	public void sortRates(){
 		this.girValues.sort(GirValue.rateComparator);
 	}
