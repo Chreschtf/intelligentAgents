@@ -2,7 +2,9 @@
 <classpath>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/negotiator2"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/math"/>
 	<classpathentry kind="src" path="genius"/>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry excluding="genius/|src/" kind="src" path=""/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
