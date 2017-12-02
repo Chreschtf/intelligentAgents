@@ -1,7 +1,7 @@
 package group13;
 
 import negotiator.Bid;
-//import org.apache.commons.math3.stat.inference.ChiSquareTest;
+import org.apache.commons.math3.stat.inference.ChiSquareTest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +12,7 @@ public class Window {
 	protected static double beta  = 5;
 	
 	protected List<GirIssue> issues;
-//	protected static ChiSquareTest chiSqTest = new ChiSquareTest();
+	protected static ChiSquareTest chiSqTest = new ChiSquareTest();
 
 	protected Window(List<Bid> bids) {
 		this.issues = new ArrayList<GirIssue>(Agent13.model.issues);
@@ -83,8 +83,7 @@ public class Window {
 		for(int i = 0; i<f1.length; i++) {
 			f1long[i] = (long)f1[i];
 		}
-		return (double)1;
-//		return chiSqTest.chiSquareTest(f0, f1long);
+		return chiSqTest.chiSquareTest(f0, f1long);
 	}
 	
 	protected int compareIssue(GirIssue i0, GirIssue i1, GirIssue io) {
