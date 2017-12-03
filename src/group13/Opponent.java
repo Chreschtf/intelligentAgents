@@ -46,7 +46,7 @@ public class Opponent {
     	
     	List<Issue>issues = uSpace.getDomain().getIssues();
     	
-    	double w0 = 1/issues.size(); //Initial Weights
+    	double w0 = (double)1/issues.size(); //Initial Weights
     	
     	Opponent.domainMap = new ArrayList<GirIssue>();
     	

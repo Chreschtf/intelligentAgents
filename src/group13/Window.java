@@ -3,7 +3,7 @@ package group13;
 import negotiator.Bid;
 import org.apache.commons.math3.stat.inference.ChiSquareTest;
 
-import java.util.ArrayList;
+//import java.util.ArrayList;
 import java.util.List;
 
 public class Window {

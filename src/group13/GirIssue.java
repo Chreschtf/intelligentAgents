@@ -115,7 +115,7 @@ public class GirIssue {
 		
 		//IV
 		for(GirValue girValue : this.girValues) {
-        	girValue.vi = (double)(1 + girValue.accepted)/(1 + total);
+        	girValue.vi = (double)(1 + girValue.offered)/(1 + total);
         	if(girValue.vi > max) {
         		max = girValue.vi;
         	}
@@ -132,7 +132,7 @@ public class GirIssue {
 		
 		//distribution frequency
 		for(GirValue value : this.girValues) {
-			value.freq = (double) (1 + value.accepted)/(1 + total);
+			value.freq = (double) (1 + value.offered)/(1 + total);
 			sum = sum + value.freq;
 		}
 		
