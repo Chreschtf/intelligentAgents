@@ -17,10 +17,7 @@ public class Window {
 	protected Window(List<Bid> bids) {
 		this.issues = new ArrayList<GirIssue>(Agent13.model.issues);
 		
-		int total = bids.size();
-		List<Bid> windowBids = (bids.subList( (total - Window.size), (total - 1)) );
-		
-		for(Bid bid : windowBids) {
+		for(Bid bid : bids) {
 			for(GirIssue issue : this.issues) {
 				issue.addValue(bid.getValue(issue.number), 0);
 			}

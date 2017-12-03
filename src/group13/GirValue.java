@@ -6,13 +6,13 @@ class GirValue {
 	protected String valueDiscrete;
 	protected int valueInt;
 	protected ISSUETYPE type;
-	protected int accepted;
-	protected int rejected;
 	protected int offered;
-	protected double probability;
-	protected double rate;
 	protected double freq;
 	protected double vi; //issue valuation
+	protected int accepted;
+	protected int rejected;
+	protected double probability;
+	protected double rate;
 	
 	protected GirValue(String value){
 		this.valueDiscrete = value;
@@ -26,17 +26,20 @@ class GirValue {
 		switch (action) {
 		    case -1:
 		    	this.rejected++;
+		    	break;
 		    case 0:
 		    	this.offered++;
+		    	break;
 		    case 1:
 		        this.accepted++;
+		        break;
 		    default:
 		}
 	}
 	
 	public String toString() {
-		return "GirValue [valueDiscrete=" + valueDiscrete + ", accepted=" + accepted + 
-				", rejected=" + rejected + ", rate=" + rate + "]";
+		return "GirValue [valueDiscrete=" + valueDiscrete + ", offered=" + offered + 
+				", freq=" + freq + ", vi=" + vi + "]";
 	}
 
 	public static Comparator<GirValue> discreteComparator = new Comparator<GirValue>() {

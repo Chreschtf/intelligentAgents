@@ -27,9 +27,9 @@ public class Opponent {
 	protected Window w0;
 	
 	protected Opponent() {				
-		bids         = new ArrayList<Bid>();
-		rejectedBids = new ArrayList<Bid>();
-		acceptedBids = new ArrayList<Bid>();
+		this.bids         = new ArrayList<Bid>();
+		this.rejectedBids = new ArrayList<Bid>();
+		this.acceptedBids = new ArrayList<Bid>();
 		
 		this.issues  = new ArrayList<GirIssue>();
 	}
@@ -41,9 +41,9 @@ public class Opponent {
 //		rejectedOffers = new ArrayList<Offer>();
 //		acceptedOffers = new ArrayList<Offer>();
 		
-		bids         = new ArrayList<Bid>();
-		rejectedBids = new ArrayList<Bid>();
-		acceptedBids = new ArrayList<Bid>();
+		this.bids         = new ArrayList<Bid>();
+		this.rejectedBids = new ArrayList<Bid>();
+		this.acceptedBids = new ArrayList<Bid>();
 		
 		this.issues  = new ArrayList<GirIssue>(issues);
 	}
@@ -57,13 +57,19 @@ public class Opponent {
 		switch (action) {
 		    case -1:
 		    	rejectedBids.add(bid);
-		    
+		    	break;
+		    	
 		    case 0:
 		    	bids.add(bid);
 		    	if((bids.size() % Window.size) == 0){window = true;}
+		    	break;
+		    	
 		    case 1:
 		    	acceptedBids.add(bid);
+		    	break;
+		    	
 		    default:
+		    	break;
 		}
 		
 		for(GirIssue issue : this.issues) {
@@ -71,12 +77,32 @@ public class Opponent {
 		}
 		
 		if(window) {
-			Window w1 = new Window(bids);
-			if(this.w0 != null) {
-				w1.compareWindows(w1, this, time);
-			}
-			this.w0 = w1;
+			this.newWindow(time);
 		}
+	}
+	
+	protected void newWindow(double time) {
+		int total = bids.size();
+		
+		for(GirIssue issue : this.issues) {issue.calcIV(total);}
+		
+		this.print();
+		
+		Window w1 = new Window(bids.subList( (total - Window.size), (total - 1)));
+		
+		if(this.w0 != null) {
+			w1.compareWindows(this.w0, this, time);
+		}
+		this.w0 = w1;
+	}
+	
+	protected double expectedUtility(Bid bid) {
+		double utility = 0;
+		for(GirIssue issue : this.issues) {
+			GirValue value = issue.getValue(bid.getValue(issue.number));
+			utility = utility + ( value.vi * issue.weight );
+		}
+		return utility;
 	}
 	
 	protected void normaliseWeights() {
@@ -89,15 +115,6 @@ public class Opponent {
 		for(GirIssue issue : this.issues) {
 			issue.weight = issue.weight/sum;
         }
-	}
-	
-	protected double expectedUtility(Bid bid) {
-		double utility = 0;
-		for(GirIssue issue : this.issues) {
-			GirValue value = issue.getValue(bid.getValue(issue.number));
-			utility = utility + ( value.vi * issue.weight );
-		}
-		return utility;
 	}
 	
 	protected void print() {
