@@ -15,7 +15,7 @@ public class Window {
 	protected static ChiSquareTest chiSqTest = new ChiSquareTest();
 
 	protected Window(List<Bid> bids) {
-		this.issues = new ArrayList<GirIssue>(Agent13.model.issues);
+		this.issues = Opponent.copyDomainMap();
 		
 		for(Bid bid : bids) {
 			for(GirIssue issue : this.issues) {

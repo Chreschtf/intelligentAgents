@@ -48,6 +48,19 @@ public class GirIssue {
 		}
 	}
 	
+	protected GirIssue(GirIssue issue) {
+		this.number = issue.number;
+		this.weight = issue.weight;
+		this.type   = issue.type;
+		this.name   = issue.name;
+		
+		this.girValues = new ArrayList<GirValue>();
+		
+		for(GirValue value : issue.girValues) {
+			this.girValues.add(new GirValue(value));
+		}
+	}
+	
 	public void addValue(Value value, int action) {
 		switch (this.type) {
 		    case REAL:

@@ -3,6 +3,10 @@ package group13;
 import java.util.ArrayList;
 import java.util.List;
 import negotiator.actions.Offer;
+import negotiator.issue.Issue;
+import negotiator.parties.NegotiationInfo;
+import negotiator.utility.AbstractUtilitySpace;
+import negotiator.utility.AdditiveUtilitySpace;
 //import negotiator.issue.Issue;
 //import negotiator.parties.NegotiationInfo;
 //import negotiator.utility.AbstractUtilitySpace;
@@ -24,6 +28,8 @@ public class Opponent {
 	
 	protected List<GirIssue> issues;
 	
+	protected static List<GirIssue> domainMap;
+	
 	protected Window w0;
 	
 	protected Opponent() {				
@@ -34,7 +40,31 @@ public class Opponent {
 		this.issues  = new ArrayList<GirIssue>();
 	}
 	
-	protected Opponent(AgentID id, List<GirIssue> issues) {
+	protected static void mapDomain(NegotiationInfo info) {
+    	AbstractUtilitySpace utilitySpace = info.getUtilitySpace();
+    	AdditiveUtilitySpace uSpace = (AdditiveUtilitySpace) utilitySpace;
+    	
+    	List<Issue>issues = uSpace.getDomain().getIssues();
+    	
+    	double w0 = 1/issues.size(); //Initial Weights
+    	
+    	Opponent.domainMap = new ArrayList<GirIssue>();
+    	
+    	for (Issue issue : issues) {
+    		Opponent.domainMap.add(new GirIssue(issue, uSpace, w0));
+    	}
+    }
+	
+	protected static List<GirIssue> copyDomainMap() {
+		List<GirIssue> map = new ArrayList<GirIssue>();
+		
+		for(GirIssue issue : domainMap) {
+			map.add(new GirIssue(issue));
+		}
+		return map;
+	}
+	
+	protected Opponent(AgentID id) {
 		this.agentId = id;
 		
 //		offers = new ArrayList<Offer>();
@@ -45,7 +75,7 @@ public class Opponent {
 		this.rejectedBids = new ArrayList<Bid>();
 		this.acceptedBids = new ArrayList<Bid>();
 		
-		this.issues  = new ArrayList<GirIssue>(issues);
+		this.issues = Opponent.copyDomainMap();
 	}
 	
 	//Add Action by the Opponent

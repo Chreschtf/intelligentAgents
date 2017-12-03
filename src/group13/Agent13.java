@@ -27,14 +27,14 @@ public class Agent13 extends AbstractNegotiationParty {
     private Bid myLastOffer;
     private ArrayList<Offer> receivedOffers;
     
-    protected static Opponent model;
+//    protected static Opponent model;
     private Opponent op1;
     private Opponent op2;
     
     private Offer lastOffer;
     private double maxUtility;
     private double minUtility;
-    private NegotiationInfo info;
+//    private NegotiationInfo info;
  
     private List<GirIssue> issues;
     private PriorityQueue<QOffer> qValues;
@@ -80,8 +80,9 @@ public class Agent13 extends AbstractNegotiationParty {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        this.info = info;
-        this.mapDomain();
+
+        Opponent.mapDomain(info);
+        this.getWeights(info);
 
         offerMade=false;
     }
@@ -238,22 +239,12 @@ public class Agent13 extends AbstractNegotiationParty {
     	return treshold; 
     }
     
-    private void mapDomain() {
-    	Agent13.model = new Opponent();
-    	
-    	AbstractUtilitySpace utilitySpace = this.info.getUtilitySpace();
+    private void getWeights(NegotiationInfo info) {
+    	AbstractUtilitySpace utilitySpace = info.getUtilitySpace();
     	AdditiveUtilitySpace uSpace = (AdditiveUtilitySpace) utilitySpace;
     	
-    	List<Issue>issues = uSpace.getDomain().getIssues();
-    	
-    	double w0 = 1/issues.size(); //Initial Weights
-    	
-    	for (Issue issue : issues) {
-    		Agent13.model.issues.add(new GirIssue(issue, uSpace, w0));
-    	}
-    	
     	//Get Weights for our agent
-    	this.issues = new ArrayList<GirIssue>(Agent13.model.issues);
+    	this.issues = Opponent.copyDomainMap();
     	for (GirIssue issue : this.issues) {
     		issue.weight = uSpace.getWeight(issue.number);
     	}
@@ -261,12 +252,12 @@ public class Agent13 extends AbstractNegotiationParty {
     
     private Opponent getOpponent(AgentID sender) {
     	if(this.op1 == null) {
-    		this.op1 = new Opponent(sender, Agent13.model.issues);
+    		this.op1 = new Opponent(sender);
     		return this.op1;
     	} else if (this.op1.agentId == sender) {
     		return this.op1;
     	} else if (this.op2 == null) {
-    		this.op2 = new Opponent(sender, Agent13.model.issues);
+    		this.op2 = new Opponent(sender);
     		return this.op2;
     	} else if (this.op2.agentId == sender) {
     		return this.op2; 
