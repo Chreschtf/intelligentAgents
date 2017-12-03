@@ -28,9 +28,11 @@ public class GirIssue {
 		
 		switch (this.type) {
 		    case REAL:
-		        
+		    	break;
+		    	
 		    case INTEGER:	
-	
+		    	break;
+		    	
 		    case DISCRETE:
 		        IssueDiscrete issueDiscrete = (IssueDiscrete) issue;
 		        List<ValueDiscrete> allValues = issueDiscrete.getValues();
@@ -39,16 +41,21 @@ public class GirIssue {
 		        	girValues.add(new GirValue(valueDiscrete.getValue()));
 		        }
 		        girValues.sort(GirValue.discreteComparator);
+		        break;
+		        
 		    default:
+		    	break;
 		}
 	}
 	
 	public void addValue(Value value, int action) {
 		switch (this.type) {
 		    case REAL:
-		        
+		    	break;
+		    	
 		    case INTEGER:
-	
+		    	break;
+		    	
 		    case DISCRETE:
 		        ValueDiscrete valueDiscrete = (ValueDiscrete)value;
 		        String valueString = valueDiscrete.getValue();
@@ -58,16 +65,21 @@ public class GirIssue {
 		        		girValue.addValue(action);
 		        	}
 		        }
+		        break;
+		        
 		    default:
+		    	break;
 		}
 	}
 	
 	protected GirValue getValue(Value value) {
 		switch (this.type) {
 		    case REAL:
-		        
+		    	break;
+		    	
 		    case INTEGER:
-	
+		    	break;
+		    	
 		    case DISCRETE:
 		        ValueDiscrete valueDiscrete = (ValueDiscrete)value;
 		        String valueString = valueDiscrete.getValue();
@@ -77,9 +89,12 @@ public class GirIssue {
 		        		return girValue;
 		        	}
 		        }
+		        break;
+		        
 		    default:
-		    	return new GirValue("Fail"); //Just for compiling sake
+		    	break;
 		}
+		return new GirValue("Fail"); //Just for compiling sake
 	}
 	
 	protected void calcIV(int total) {
