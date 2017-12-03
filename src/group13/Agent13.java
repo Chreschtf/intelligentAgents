@@ -298,14 +298,5 @@ public class Agent13 extends AbstractNegotiationParty {
             this.qValues.add(qtemp);
         }
 
-        /*
-        try {
-            while (qValuesNotConsideredYet.size() != 0 && qValuesNotConsideredYet.peek().getUtility() >= threshold) {
-                QOffer qtemp = qValuesNotConsideredYet.poll();
-                qValues.add(qtemp);
-            }
-        }catch (Exception e) {
-            e.printStackTrace();
-        }*/
     }
 }
