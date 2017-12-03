@@ -48,6 +48,8 @@ public class Agent13 extends AbstractNegotiationParty {
     private double gamma = 0.9;
     private double rewardReject = -2;
     private double rewardAcceptOnce = -1;
+    private double timeStep=0.1;
+    private double timeThreshold = 0.1;
 
     
     @Override
@@ -104,16 +106,21 @@ public class Agent13 extends AbstractNegotiationParty {
 //        	this.op2.calculateRates();
         }
         
-        if (time<0.9){
+        if (time>this.timeThreshold){
             this.addNashQvalues();
+            timeThreshold+=0.1;
         }
 
         //System.out.println(this.qValues.peek().getUtility());
         if (this.myLastQOffer!=null){
+        	double maxQvalue=this.myLastQOffer.getQvalue();
+        	if (this.qValues.peek()!= null) {
+        		maxQvalue = this.qValues.peek().getQvalue();
+        	}
             if (lastOfferAcceptedBySucceedingAgent)
-                myLastQOffer.updateQvalue(rewardAcceptOnce,this.qValues.peek().getQvalue());
+                myLastQOffer.updateQvalue(rewardAcceptOnce,maxQvalue);
             else
-                myLastQOffer.updateQvalue(rewardReject,this.qValues.peek().getQvalue());
+                myLastQOffer.updateQvalue(rewardReject,maxQvalue);
         }
 
         if (this.lastOffer!=null && this.myLastQOffer!=null ){
@@ -129,11 +136,15 @@ public class Agent13 extends AbstractNegotiationParty {
             } 
         }
         
-        QOffer myNextQOffer = this.qValues.poll();
-        offerMade=true;
-        this.lastOffer = new Offer(this.getPartyId(),myNextQOffer.getBid());
         if (myLastQOffer!=null)
             this.qValues.add(myLastQOffer);
+        QOffer myNextQOffer = this.qValues.poll();
+        //if(this.qValues.peek()!=null) {
+        //	myNextQOffer = this.qValues.poll();
+        //}
+        offerMade=true;
+        this.lastOffer = new Offer(this.getPartyId(),myNextQOffer.getBid());
+        
         myLastQOffer=myNextQOffer;
         return this.lastOffer;
     }
@@ -274,8 +285,15 @@ public class Agent13 extends AbstractNegotiationParty {
             double nashUtility = 1;
             double ourUtility =this.getUtility(bid);
             nashUtility*=ourUtility;
-            nashUtility*=op1.expectedUtility(bid);
-            nashUtility*=op2.expectedUtility(bid);
+            try{
+
+                double op1Utility=op1.expectedUtility(bid);
+                nashUtility*=op1Utility;
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            double op2Utility=op2.expectedUtility(bid);
+            nashUtility*=op2Utility;
             QOffer qtemp = new QOffer(bid,ourUtility,nashUtility);
             this.qValues.add(qtemp);
         }
