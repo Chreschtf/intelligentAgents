@@ -39,8 +39,6 @@ public class Agent13 extends AbstractNegotiationParty {
     private boolean lastOfferAcceptedBySucceedingAgent;
     private double epsilon = 0.4;
     private double waitPhase = 0.1;
-    private double alpha = 0.1;
-    private double gamma = 0.9;
     private double rewardReject = -2;
     private double rewardAcceptOnce = -1;
     private double timeStep=0.1;
@@ -95,16 +93,9 @@ public class Agent13 extends AbstractNegotiationParty {
         // Accept, Offer and EndNegotiation actions only.
         double time = getTimeLine().getTime(); // Gets the time, running from t = 0 (start) to t = 1 (deadline).
         
-        if(op1!=null) {
-//        	this.op1.calculateRates();
-        }
-        if(op2!=null) {
-//        	this.op2.calculateRates();
-        }
-        
         if (time>this.timeThreshold){
             this.addNashQvalues();
-            timeThreshold+=0.1;
+            timeThreshold+=this.timeStep;
         }
 
         //System.out.println(this.qValues.peek().getUtility());
@@ -194,34 +185,34 @@ public class Agent13 extends AbstractNegotiationParty {
         return description;
     }
 
-    private Bid getMaxUtilityBid() {
-        try {
-            return this.utilitySpace.getMaxUtilityBid();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+//    private Bid getMaxUtilityBid() {
+//        try {
+//            return this.utilitySpace.getMaxUtilityBid();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
 
     
-    public Bid generateRandomBidWithTreshold(double utilityThreshold) {
-    	if(utilityThreshold>this.maxUtility) {
-    		return this.getMaxUtilityBid();
-    	}
-    	
-        Bid randomBid;
-        double utility;
-        do {
-            randomBid = generateRandomBid();
-            try {
-                utility = utilitySpace.getUtility(randomBid);
-            } catch (Exception e){
-                utility = 0.0;
-            }
-        }
-        while (utility < utilityThreshold);
-        return randomBid;
-    }
+//    public Bid generateRandomBidWithTreshold(double utilityThreshold) {
+//    	if(utilityThreshold>this.maxUtility) {
+//    		return this.getMaxUtilityBid();
+//    	}
+//    	
+//        Bid randomBid;
+//        double utility;
+//        do {
+//            randomBid = generateRandomBid();
+//            try {
+//                utility = utilitySpace.getUtility(randomBid);
+//            } catch (Exception e){
+//                utility = 0.0;
+//            }
+//        }
+//        while (utility < utilityThreshold);
+//        return randomBid;
+//    }
     
     private double timePressure(double time) {
     	if (time <= this.waitPhase) {return 1;}
@@ -262,24 +253,26 @@ public class Agent13 extends AbstractNegotiationParty {
 
     private void addNashQvalues(){
         this.qValues.clear();
-        double threshold = min(this.calcUtilityTreshold(),0.9);
+        double threshold = min(this.calcUtilityTreshold(),(this.maxUtility * 0.9));
         Range range = new Range(threshold,1);
         SortedOutcomeSpace sos= new SortedOutcomeSpace(this.getUtilitySpace());
         List<BidDetails> bidDetails = sos.getBidsinRange(range);
         for (BidDetails bidd : bidDetails){
             Bid bid = bidd.getBid();
             double nashUtility = 1;
-            double ourUtility =this.getUtility(bid);
+            
+            double ourUtility = this.getUtility(bid);
             nashUtility*=ourUtility;
-            try{
-
+            
+            if(op1 != null) {
                 double op1Utility=op1.expectedUtility(bid);
                 nashUtility*=op1Utility;
-            }catch (Exception e){
-                e.printStackTrace();
             }
-            double op2Utility=op2.expectedUtility(bid);
-            nashUtility*=op2Utility;
+            if(op2 != null) {
+            	double op2Utility=op2.expectedUtility(bid);
+            	nashUtility*=op2Utility;
+            }
+            
             QOffer qtemp = new QOffer(bid,ourUtility,nashUtility);
             this.qValues.add(qtemp);
         }
