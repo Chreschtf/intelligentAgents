@@ -11,8 +11,6 @@ class GirValue {
 	protected double vi; //issue valuation
 	protected int accepted;
 	protected int rejected;
-	protected double probability;
-	protected double rate;
 	
 	protected GirValue(String value){
 		this.valueDiscrete = value;
@@ -70,10 +68,4 @@ class GirValue {
 			return d1.compareTo(d2);
 		}
 	};
-	
-//	public static Comparator<GirValue> rateComparator = new Comparator<GirValue>() {
-//		public int compare(GirValue value1, GirValue value2) {
-//			return Double.compare(value2.rate, value1.rate);
-//		}
-//	};
 }

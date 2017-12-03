@@ -7,7 +7,6 @@ import negotiator.actions.Action;
 import negotiator.actions.Offer;
 import negotiator.bidding.BidDetails;
 import negotiator.boaframework.SortedOutcomeSpace;
-import negotiator.issue.Issue;
 import negotiator.parties.AbstractNegotiationParty;
 import negotiator.parties.NegotiationInfo;
 import negotiator.utility.AbstractUtilitySpace;
@@ -24,17 +23,13 @@ import static java.lang.Math.min;
 public class Agent13 extends AbstractNegotiationParty {
     private final String description = "Agent13";
 
-    private Bid myLastOffer;
     private ArrayList<Offer> receivedOffers;
     
-//    protected static Opponent model;
     private Opponent op1;
     private Opponent op2;
     
     private Offer lastOffer;
     private double maxUtility;
-    private double minUtility;
-//    private NegotiationInfo info;
  
     private List<GirIssue> issues;
     private PriorityQueue<QOffer> qValues;
@@ -72,10 +67,10 @@ public class Agent13 extends AbstractNegotiationParty {
         qValues.add(qtemp);
 
         try {
-            Bid minBid = this.utilitySpace.getMinUtilityBid();
+//            Bid minBid = this.utilitySpace.getMinUtilityBid();
             Bid maxBid = this.utilitySpace.getMaxUtilityBid();
             maxUtility = getUtility(maxBid);
-            minUtility = getUtility(minBid);
+//            minUtility = getUtility(minBid);
 //            utilityThreshold = (maxUtility-minUtility)/2+minUtility;
         } catch (Exception e) {
             e.printStackTrace();

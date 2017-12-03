@@ -1,9 +1,6 @@
 package group13;
 
 import negotiator.Bid;
-//import org.apache.commons.math3.stat.inference.ChiSquareTest;
-
-//import java.util.ArrayList;
 import java.util.List;
 
 public class Window {
@@ -12,7 +9,6 @@ public class Window {
 	protected static double beta  = 5;
 	
 	protected List<GirIssue> issues;
-//	protected static ChiSquareTest chiSqTest = new ChiSquareTest();
 
 	protected Window(List<Bid> bids) {
 		this.issues = Opponent.copyDomainMap();
@@ -52,7 +48,6 @@ public class Window {
 			i1 = this.issues.get(i);
 			io = op.issues.get(i);
 			
-//			pval = this.chiSquareTest(i0.getFreqs(), i1.getFreqs());
 			pval = this.freqTest(i0.getFreqs(), i1.getFreqs());
 			
 			if(pval<0.08) { //no issue change, weight is important
@@ -74,15 +69,6 @@ public class Window {
 		return Window.alpha * (1 - (Math.pow(time, Window.beta)));
 	}
 	
-//	protected double chiSquareTest(double[] f0, double[] f1) {
-//		long[] f1long = new long[f1.length];
-//		
-//		for(int i = 0; i<f1.length; i++) {
-//			f1long[i] = (long)f1[i];
-//		}
-//		return chiSqTest.chiSquareTest(f0, f1long);
-//	}
-
 	protected double freqTest(double[] f0, double[] f1) {
 		double sum = 0;
 		

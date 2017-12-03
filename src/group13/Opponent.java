@@ -15,11 +15,7 @@ import negotiator.AgentID;
 import negotiator.Bid;
 
 
-public class Opponent {
-	protected ArrayList<Offer> offers;
-	protected ArrayList<Offer> rejectedOffers;
-	protected ArrayList<Offer> acceptedOffers;
-	
+public class Opponent {	
 	protected ArrayList<Bid> bids;
 	protected ArrayList<Bid> rejectedBids;
 	protected ArrayList<Bid> acceptedBids;
@@ -66,10 +62,6 @@ public class Opponent {
 	
 	protected Opponent(AgentID id) {
 		this.agentId = id;
-		
-//		offers = new ArrayList<Offer>();
-//		rejectedOffers = new ArrayList<Offer>();
-//		acceptedOffers = new ArrayList<Offer>();
 		
 		this.bids         = new ArrayList<Bid>();
 		this.rejectedBids = new ArrayList<Bid>();
