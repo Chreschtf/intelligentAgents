@@ -1,4 +1,5 @@
 package group13;
+import misc.Range;
 import negotiator.AgentID;
 import negotiator.Bid;
 import negotiator.actions.Accept;
@@ -7,12 +8,10 @@ import negotiator.actions.Offer;
 import negotiator.bidding.BidDetails;
 import negotiator.boaframework.SortedOutcomeSpace;
 import negotiator.issue.Issue;
-import negotiator.issue.IssueDiscrete;
 import negotiator.parties.AbstractNegotiationParty;
 import negotiator.parties.NegotiationInfo;
 import negotiator.utility.AbstractUtilitySpace;
 import negotiator.utility.AdditiveUtilitySpace;
-import negotiator.utility.EvaluatorDiscrete;
 import negotiator.BidIterator;
 
 import java.util.Comparator;
@@ -63,7 +62,7 @@ public class Agent13 extends AbstractNegotiationParty {
 
         while (bidIterator.hasNext()) {
             Bid bid = bidIterator.next();
-            QOffer tmpQoffer = new QOffer(bid,this.getUtility(bid),this.getUtility(bid),alpha,gamma);
+            QOffer tmpQoffer = new QOffer(bid,this.getUtility(bid),this.getUtility(bid));
             qValuesNotConsideredYet.add(tmpQoffer);
         }
 
@@ -106,7 +105,7 @@ public class Agent13 extends AbstractNegotiationParty {
         }
         
         if (time<0.9){
-            this.addQvalues();
+            this.addNashQvalues();
         }
 
         //System.out.println(this.qValues.peek().getUtility());
@@ -264,8 +263,24 @@ public class Agent13 extends AbstractNegotiationParty {
     	return this.op1;
     }
 
-    private void addQvalues(){
+    private void addNashQvalues(){
+        this.qValues.clear();
         double threshold = min(this.calcUtilityTreshold(),0.9);
+        Range range = new Range(threshold,1);
+        SortedOutcomeSpace sos= new SortedOutcomeSpace(this.getUtilitySpace());
+        List<BidDetails> bidDetails = sos.getBidsinRange(range);
+        for (BidDetails bidd : bidDetails){
+            Bid bid = bidd.getBid();
+            double nashUtility = 1;
+            double ourUtility =this.getUtility(bid);
+            nashUtility*=ourUtility;
+            nashUtility*=op1.expectedUtility(bid);
+            nashUtility*=op2.expectedUtility(bid);
+            QOffer qtemp = new QOffer(bid,ourUtility,nashUtility);
+            this.qValues.add(qtemp);
+        }
+
+        /*
         try {
             while (qValuesNotConsideredYet.size() != 0 && qValuesNotConsideredYet.peek().getUtility() >= threshold) {
                 QOffer qtemp = qValuesNotConsideredYet.poll();
@@ -273,6 +288,6 @@ public class Agent13 extends AbstractNegotiationParty {
             }
         }catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
     }
 }
