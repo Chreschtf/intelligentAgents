@@ -33,7 +33,7 @@ public class Agent13 extends AbstractNegotiationParty {
  
     private List<GirIssue> issues;
     private PriorityQueue<QOffer> qValues;
-    private PriorityQueue<QOffer> qValuesNotConsideredYet;
+    //private PriorityQueue<QOffer> qValuesNotConsideredYet;
     private QOffer myLastQOffer;
     private boolean offerMade;
     private boolean lastOfferAcceptedBySucceedingAgent;
@@ -52,22 +52,24 @@ public class Agent13 extends AbstractNegotiationParty {
         BidIterator bidIterator = new BidIterator(this.utilitySpace.getDomain());
         Comparator<QOffer> comparator = new QComparator();
         qValues = new PriorityQueue<QOffer>(comparator);
-        qValuesNotConsideredYet = new PriorityQueue<QOffer>(comparator);
+//        qValuesNotConsideredYet = new PriorityQueue<QOffer>(comparator);
+//
+//
+//        while (bidIterator.hasNext()) {
+//            Bid bid = bidIterator.next();
+//            QOffer tmpQoffer = new QOffer(bid,this.getUtility(bid),this.getUtility(bid));
+//            qValuesNotConsideredYet.add(tmpQoffer);
+//        }
 
-
-        while (bidIterator.hasNext()) {
-            Bid bid = bidIterator.next();
-            QOffer tmpQoffer = new QOffer(bid,this.getUtility(bid),this.getUtility(bid));
-            qValuesNotConsideredYet.add(tmpQoffer);
-        }
-
-        QOffer qtemp= qValuesNotConsideredYet.poll();
-        qValues.add(qtemp);
+//        QOffer qtemp= qValuesNotConsideredYet.poll();
+//        qValues.add(qtemp);
 
         try {
 //            Bid minBid = this.utilitySpace.getMinUtilityBid();
             Bid maxBid = this.utilitySpace.getMaxUtilityBid();
             maxUtility = getUtility(maxBid);
+            QOffer tmpQoffer = new QOffer(maxBid,maxUtility,maxUtility);
+            qValues.add(tmpQoffer);
 //            minUtility = getUtility(minBid);
 //            utilityThreshold = (maxUtility-minUtility)/2+minUtility;
         } catch (Exception e) {
@@ -110,7 +112,7 @@ public class Agent13 extends AbstractNegotiationParty {
                 myLastQOffer.updateQvalue(rewardReject,maxQvalue);
         }
 
-        if (this.lastOffer!=null && this.myLastQOffer!=null ){
+        if (this.lastOffer!=null && this.myLastQOffer!=null && this.qValues.peek()!=null){
             try{
                 double lastOfferUtility = this.getUtility(lastOffer.getBid());
                 if (this.getUtility(lastOffer.getBid()) >=  this.myLastQOffer.getUtility()
