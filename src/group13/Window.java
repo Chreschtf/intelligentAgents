@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Window {
 	protected static int size = 30;
-	protected static double alpha = 0.1;
+	protected static double alpha = 0.2;
 	protected static double beta  = 5;
 	
 	protected List<GirIssue> issues;

@@ -116,7 +116,7 @@ public class Opponent {
 			w1.compareWindows(this.w0, this, time);
 		}
 		this.w0 = w1;
-//		this.print2();
+		this.print2();
 	}
 	
 	protected double expectedUtility(Bid bid) {
