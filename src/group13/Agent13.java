@@ -43,9 +43,13 @@ public class Agent13 extends AbstractNegotiationParty {
     private double waitPhase = 0.1;
     private double rewardReject = -2;
     private double rewardAcceptOnce = -1;
-    private double timeStep=0.1;
+    private double timeStep=10/180;
     private double timeThreshold = 0.1;
-    private double minUtility; 
+    private double minUtility;
+    private double maxMinUtilityDistCoefficient=0.5;
+
+    private double roundsSinceLastUpdate = 0;
+    private double roundThreshold = 150;
 
     
     @Override
@@ -54,7 +58,9 @@ public class Agent13 extends AbstractNegotiationParty {
         receivedOffers = new ArrayList<Offer>() ;
 //        BidIterator bidIterator = new BidIterator(this.utilitySpace.getDomain());
         Comparator<QOffer> comparator = new QComparator();
-        qValues = new PriorityQueue<QOffer>(comparator);
+        qValues = new PriorityQueue<QOffer>(Comparator.comparing(QOffer::getQvalue)
+                                                    .thenComparing(QOffer::getUtility)
+        .reversed());
 //        qValuesNotConsideredYet = new PriorityQueue<QOffer>(comparator);
 //
 //
@@ -72,7 +78,7 @@ public class Agent13 extends AbstractNegotiationParty {
             Bid maxBid = this.utilitySpace.getMaxUtilityBid();
             maxUtility = getUtility(maxBid);
             minUtility = getUtility(minBid);
-            minUtility = (maxUtility-minUtility)/2+minUtility;
+            minUtility = (maxUtility-minUtility)*maxMinUtilityDistCoefficient+minUtility;
             System.out.println("Min Utility =" + this.minUtility);
             
             this.SOS = new SortedOutcomeSpace(this.getUtilitySpace());
@@ -111,10 +117,10 @@ public class Agent13 extends AbstractNegotiationParty {
         // According to Stacked Alternating Offers Protocol list includes
         // Accept, Offer and EndNegotiation actions only.
         double time = getTimeLine().getTime(); // Gets the time, running from t = 0 (start) to t = 1 (deadline).
-        
-        if (time>this.timeThreshold){
+        roundsSinceLastUpdate+=1;
+        if (roundsSinceLastUpdate>roundThreshold){
             this.addNashQvalues();
-            timeThreshold+=this.timeStep;
+            roundsSinceLastUpdate=0;
         }
 
         //System.out.println(this.qValues.peek().getUtility());
@@ -132,9 +138,15 @@ public class Agent13 extends AbstractNegotiationParty {
         if (this.lastOffer!=null && this.myLastQOffer!=null && this.qValues.peek()!=null){
             try{
                 double lastOfferUtility = this.getUtility(lastOffer.getBid());
-                if (this.getUtility(lastOffer.getBid()) >=  this.myLastQOffer.getUtility()
+                if (lastOfferUtility >=  this.myLastQOffer.getUtility()
                         && lastOfferUtility >= this.qValues.peek().getUtility()) {
                     this.qValues.add(myLastQOffer);
+                    if (lastOfferUtility<minUtility) {
+                        System.out.println("###############################");
+                        System.out.println("below threshold: " + lastOfferUtility);
+                        System.out.println("threshold: " + minUtility);
+                        System.out.println("###############################");
+                    }
                     return new Accept(this.getPartyId(), this.lastOffer.getBid());
                 }
             }catch (Exception e) {
@@ -295,5 +307,6 @@ public class Agent13 extends AbstractNegotiationParty {
             this.qValues.add(qtemp);
         }
         this.myLastQOffer = null;
+
     }
 }
