@@ -41,7 +41,7 @@ public class Agent13 extends AbstractNegotiationParty {
     private boolean lastOfferAcceptedBySucceedingAgent;
     private double epsilon = 0.2;
     private double waitPhase = 0.1;
-    private double rewardReject = -2;
+    private double rewardReject = -1;
     private double rewardAcceptOnce = -1;
     private double timeStep=10/180;
     private double timeThreshold = 0.1;
@@ -49,7 +49,7 @@ public class Agent13 extends AbstractNegotiationParty {
     private double maxMinUtilityDistCoefficient=0.5;
 
     private double roundsSinceLastUpdate = 0;
-    private double roundThreshold = 150;
+    private double roundThreshold = 150*2;
 
     
     @Override
@@ -117,11 +117,16 @@ public class Agent13 extends AbstractNegotiationParty {
         // According to Stacked Alternating Offers Protocol list includes
         // Accept, Offer and EndNegotiation actions only.
         double time = getTimeLine().getTime(); // Gets the time, running from t = 0 (start) to t = 1 (deadline).
-        roundsSinceLastUpdate+=1;
-        if (roundsSinceLastUpdate>roundThreshold){
+//        roundsSinceLastUpdate+=1;
+//        if (roundsSinceLastUpdate>roundThreshold){
+//            this.addNashQvalues();
+//            roundsSinceLastUpdate=0;
+//        }
+        if (time>this.timeThreshold) {
             this.addNashQvalues();
-            roundsSinceLastUpdate=0;
+            timeThreshold+=this.timeStep;
         }
+
 
         //System.out.println(this.qValues.peek().getUtility());
         if (this.myLastQOffer!=null){
