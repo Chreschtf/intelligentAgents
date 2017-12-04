@@ -11,7 +11,7 @@ import negotiator.parties.AbstractNegotiationParty;
 import negotiator.parties.NegotiationInfo;
 import negotiator.utility.AbstractUtilitySpace;
 import negotiator.utility.AdditiveUtilitySpace;
-import negotiator.BidIterator;
+//import negotiator.BidIterator;
 
 import java.util.Comparator;
 import java.util.List;
@@ -47,31 +47,16 @@ public class Agent13 extends AbstractNegotiationParty {
     private double timeThreshold = 0.1;
     private double minUtility;
     private double maxMinUtilityDistCoefficient=0.5;
-
-    private double roundsSinceLastUpdate = 0;
-    private double roundThreshold = 150*2;
-
     
     @Override
     public void init(NegotiationInfo info) {
         super.init(info);
         receivedOffers = new ArrayList<Offer>() ;
-//        BidIterator bidIterator = new BidIterator(this.utilitySpace.getDomain());
-        Comparator<QOffer> comparator = new QComparator();
+
+//        Comparator<QOffer> comparator = new QComparator();
         qValues = new PriorityQueue<QOffer>(Comparator.comparing(QOffer::getQvalue)
                                                     .thenComparing(QOffer::getUtility)
         .reversed());
-//        qValuesNotConsideredYet = new PriorityQueue<QOffer>(comparator);
-//
-//
-//        while (bidIterator.hasNext()) {
-//            Bid bid = bidIterator.next();
-//            QOffer tmpQoffer = new QOffer(bid,this.getUtility(bid),this.getUtility(bid));
-//            qValuesNotConsideredYet.add(tmpQoffer);
-//        }
-
-//        QOffer qtemp= qValuesNotConsideredYet.poll();
-//        qValues.add(qtemp);
 
         try {
             Bid minBid = this.utilitySpace.getMinUtilityBid();
@@ -83,15 +68,15 @@ public class Agent13 extends AbstractNegotiationParty {
             
             this.SOS = new SortedOutcomeSpace(this.getUtilitySpace());
             
-            //has to go
-            Range range = new Range(this.minUtility,this.maxUtility);
-            List<BidDetails> bidDetails = this.SOS.getBidsinRange(range);
-            System.out.println("Bids =" + bidDetails.size());
-            
-            range = new Range(0,1);
-            bidDetails = this.SOS.getBidsinRange(range);
-            System.out.println("Bids =" + bidDetails.size());
-            //
+//            //has to go
+//            Range range = new Range(this.minUtility,this.maxUtility);
+//            List<BidDetails> bidDetails = this.SOS.getBidsinRange(range);
+//            System.out.println("Bids =" + bidDetails.size());
+//            
+//            range = new Range(0,1);
+//            bidDetails = this.SOS.getBidsinRange(range);
+//            System.out.println("Bids =" + bidDetails.size());
+//            //
             
             QOffer tmpQoffer = new QOffer(maxBid,maxUtility,maxUtility);
             qValues.add(tmpQoffer);
@@ -117,18 +102,12 @@ public class Agent13 extends AbstractNegotiationParty {
         // According to Stacked Alternating Offers Protocol list includes
         // Accept, Offer and EndNegotiation actions only.
         double time = getTimeLine().getTime(); // Gets the time, running from t = 0 (start) to t = 1 (deadline).
-//        roundsSinceLastUpdate+=1;
-//        if (roundsSinceLastUpdate>roundThreshold){
-//            this.addNashQvalues();
-//            roundsSinceLastUpdate=0;
-//        }
+
         if (time>this.timeThreshold) {
             this.addNashQvalues();
             timeThreshold+=this.timeStep;
         }
 
-
-        //System.out.println(this.qValues.peek().getUtility());
         if (this.myLastQOffer!=null){
         	double maxQvalue=this.myLastQOffer.getQvalue();
         	if (this.qValues.peek()!= null) {
@@ -165,18 +144,11 @@ public class Agent13 extends AbstractNegotiationParty {
                 }
             }
         }
-//                }
-//            }catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
         
         if (myLastQOffer!=null)
             this.qValues.add(myLastQOffer);
         QOffer myNextQOffer = this.qValues.poll();
-        //if(this.qValues.peek()!=null) {
-        //	myNextQOffer = this.qValues.poll();
-        //}
+
         offerMade=true;
         this.lastOffer = new Offer(this.getPartyId(),myNextQOffer.getBid());
         
@@ -233,35 +205,6 @@ public class Agent13 extends AbstractNegotiationParty {
         return description;
     }
 
-//    private Bid getMaxUtilityBid() {
-//        try {
-//            return this.utilitySpace.getMaxUtilityBid();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
-
-    
-//    public Bid generateRandomBidWithTreshold(double utilityThreshold) {
-//    	if(utilityThreshold>this.maxUtility) {
-//    		return this.getMaxUtilityBid();
-//    	}
-//    	
-//        Bid randomBid;
-//        double utility;
-//        do {
-//            randomBid = generateRandomBid();
-//            try {
-//                utility = utilitySpace.getUtility(randomBid);
-//            } catch (Exception e){
-//                utility = 0.0;
-//            }
-//        }
-//        while (utility < utilityThreshold);
-//        return randomBid;
-//    }
-    
     private double timePressure(double time) {
     	if (time <= this.waitPhase) {return 1;}
     	return 1 - Math.pow(time, (1/this.epsilon));
