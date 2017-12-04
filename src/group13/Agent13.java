@@ -43,7 +43,7 @@ public class Agent13 extends AbstractNegotiationParty {
     private double waitPhase = 0.1;
     private double rewardReject = -1;
     private double rewardAcceptOnce = -1;
-    private double timeStep=10/180;
+    private double timeStep=5/180;
     private double timeThreshold = 0.1;
     private double minUtility;
     private double maxMinUtilityDistCoefficient=0.5;
@@ -140,24 +140,36 @@ public class Agent13 extends AbstractNegotiationParty {
                 myLastQOffer.updateQvalue(rewardReject,maxQvalue);
         }
 
-        if (this.lastOffer!=null && this.myLastQOffer!=null && this.qValues.peek()!=null){
-            try{
-                double lastOfferUtility = this.getUtility(lastOffer.getBid());
-                if (lastOfferUtility >=  this.myLastQOffer.getUtility()
-                        && lastOfferUtility >= this.qValues.peek().getUtility()) {
+//        if (this.lastOffer!=null && this.myLastQOffer!=null && this.qValues.peek()!=null){
+//            try{
+//                double lastOfferUtility = this.getUtility(lastOffer.getBid());
+//                if (lastOfferUtility >=  this.myLastQOffer.getUtility()
+//                        && lastOfferUtility >= this.qValues.peek().getUtility()) {
+//                    this.qValues.add(myLastQOffer);
+//                    if (lastOfferUtility<minUtility) {
+//                        System.out.println("###############################");
+//                        System.out.println("below threshold: " + lastOfferUtility);
+//                        System.out.println("threshold: " + minUtility);
+//                        System.out.println("###############################");
+//                    }
+        if (this.lastOffer!=null) {
+            if (myLastQOffer!=null){
+                if (this.getUtility(lastOffer.getBid())>=myLastQOffer.getUtility()){
                     this.qValues.add(myLastQOffer);
-                    if (lastOfferUtility<minUtility) {
-                        System.out.println("###############################");
-                        System.out.println("below threshold: " + lastOfferUtility);
-                        System.out.println("threshold: " + minUtility);
-                        System.out.println("###############################");
-                    }
                     return new Accept(this.getPartyId(), this.lastOffer.getBid());
                 }
-            }catch (Exception e) {
-                e.printStackTrace();
-            } 
+            }
+            else {
+                if (this.getUtility(lastOffer.getBid())>=this.calcUtilityTreshold()){
+                    return new Accept(this.getPartyId(), this.lastOffer.getBid());
+                }
+            }
         }
+//                }
+//            }catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
         
         if (myLastQOffer!=null)
             this.qValues.add(myLastQOffer);
