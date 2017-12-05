@@ -102,7 +102,7 @@ public class Agent13 extends AbstractNegotiationParty {
         // According to Stacked Alternating Offers Protocol list includes
         // Accept, Offer and EndNegotiation actions only.
         double time = getTimeLine().getTime(); // Gets the time, running from t = 0 (start) to t = 1 (deadline).
-
+        
         if (time>this.timeThreshold ) {
             this.addNashQvalues();
             timeThreshold+=this.timeStep;

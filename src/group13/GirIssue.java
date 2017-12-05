@@ -115,7 +115,7 @@ public class GirIssue {
 		
 		//IV
 		for(GirValue girValue : this.girValues) {
-        	girValue.vi = (double)(1 + girValue.offered)/(1 + total);
+        	girValue.vi = Math.pow((1 + girValue.offered), 0.25);
         	if(girValue.vi > max) {
         		max = girValue.vi;
         	}
@@ -126,6 +126,23 @@ public class GirIssue {
         	girValue.vi = girValue.vi / max;
         }
 	}
+	
+//	protected void calcIV(int total) {
+//		double max = 0;
+//		
+//		//IV
+//		for(GirValue girValue : this.girValues) {
+//        	girValue.vi = (double)(1 + girValue.offered)/(1 + total);
+//        	if(girValue.vi > max) {
+//        		max = girValue.vi;
+//        	}
+//        }
+//		
+//		//Normalise by the max
+//		for(GirValue girValue : this.girValues) {
+//        	girValue.vi = girValue.vi / max;
+//        }
+//	}
 	
 	protected void calcFrequencies(int total) {
 		double sum = 0;
