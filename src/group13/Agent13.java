@@ -43,7 +43,7 @@ public class Agent13 extends AbstractNegotiationParty {
     private double waitPhase = 0.1;
     private double rewardReject = -1;
     private double rewardAcceptOnce = -1;
-    private double timeStep=5/180;
+    private double timeStep=9/180;
     private double timeThreshold = 0.1;
     private double minUtility;
     private double maxMinUtilityDistCoefficient=0.5;
@@ -103,11 +103,13 @@ public class Agent13 extends AbstractNegotiationParty {
         // Accept, Offer and EndNegotiation actions only.
         double time = getTimeLine().getTime(); // Gets the time, running from t = 0 (start) to t = 1 (deadline).
 
-        if (time>this.timeThreshold) {
+        if (time>this.timeThreshold ) {
             this.addNashQvalues();
             timeThreshold+=this.timeStep;
+        }else if (this.qValues.isEmpty()){
+            this.addNashQvalues();
         }
-
+/*
         if (this.myLastQOffer!=null){
         	double maxQvalue=this.myLastQOffer.getQvalue();
         	if (this.qValues.peek()!= null) {
@@ -118,7 +120,7 @@ public class Agent13 extends AbstractNegotiationParty {
             else
                 myLastQOffer.updateQvalue(rewardReject,maxQvalue);
         }
-
+*/
 //        if (this.lastOffer!=null && this.myLastQOffer!=null && this.qValues.peek()!=null){
 //            try{
 //                double lastOfferUtility = this.getUtility(lastOffer.getBid());
@@ -134,7 +136,7 @@ public class Agent13 extends AbstractNegotiationParty {
         if (this.lastOffer!=null) {
             if (myLastQOffer!=null){
                 if (this.getUtility(lastOffer.getBid())>=myLastQOffer.getUtility()){
-                    this.qValues.add(myLastQOffer);
+                    //this.qValues.add(myLastQOffer);
                     return new Accept(this.getPartyId(), this.lastOffer.getBid());
                 }
             }
@@ -145,8 +147,8 @@ public class Agent13 extends AbstractNegotiationParty {
             }
         }
         
-        if (myLastQOffer!=null)
-            this.qValues.add(myLastQOffer);
+        //if (myLastQOffer!=null)
+        //    this.qValues.add(myLastQOffer);
         QOffer myNextQOffer = this.qValues.poll();
 
         offerMade=true;
