@@ -5,8 +5,6 @@ public class QOffer {
     private Bid bid;
     private double utility;
     private double qvalue;
-    private final double alpha = 0.1;
-    private final double gamma = 0.9;
 
     public QOffer(Bid bid_,double utility_,double qvalue_){
         bid=bid_;
@@ -25,7 +23,4 @@ public class QOffer {
         return qvalue;
     }
 
-    public void updateQvalue(double reward,double maxQval){
-        qvalue=(1-alpha)*qvalue + alpha*(reward+gamma*maxQval);
-    }
 }

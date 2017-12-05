@@ -108,8 +108,7 @@ public class Opponent {
 		
 		for(GirIssue issue : this.issues) {issue.calcIV(total);}
 		
-//		this.print();
-		
+
 		Window w1 = new Window(bids.subList( (total - Window.size), (total - 1)));
 		
 		if(this.w0 != null) {

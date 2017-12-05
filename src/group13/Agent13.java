@@ -11,7 +11,6 @@ import negotiator.parties.AbstractNegotiationParty;
 import negotiator.parties.NegotiationInfo;
 import negotiator.utility.AbstractUtilitySpace;
 import negotiator.utility.AdditiveUtilitySpace;
-//import negotiator.BidIterator;
 
 import java.util.Comparator;
 import java.util.List;
@@ -37,13 +36,9 @@ public class Agent13 extends AbstractNegotiationParty {
     SortedOutcomeSpace SOS;
     
     private QOffer myLastQOffer;
-    private boolean offerMade;
-    private boolean lastOfferAcceptedBySucceedingAgent;
     private double epsilon = 0.2;
     private double waitPhase = 0.1;
-    private double rewardReject = -1;
-    private double rewardAcceptOnce = -1;
-    private double timeStep=9/180;
+    private double timeStep=6/180;
     private double timeThreshold = 0.1;
     private double minUtility;
     private double maxMinUtilityDistCoefficient=0.5;
@@ -53,7 +48,6 @@ public class Agent13 extends AbstractNegotiationParty {
         super.init(info);
         receivedOffers = new ArrayList<Offer>() ;
 
-//        Comparator<QOffer> comparator = new QComparator();
         qValues = new PriorityQueue<QOffer>(Comparator.comparing(QOffer::getQvalue)
                                                     .thenComparing(QOffer::getUtility)
         .reversed());
@@ -64,20 +58,8 @@ public class Agent13 extends AbstractNegotiationParty {
             maxUtility = getUtility(maxBid);
             minUtility = getUtility(minBid);
             minUtility = (maxUtility-minUtility)*maxMinUtilityDistCoefficient+minUtility;
-            System.out.println("Min Utility =" + this.minUtility);
             
             this.SOS = new SortedOutcomeSpace(this.getUtilitySpace());
-            
-//            //has to go
-//            Range range = new Range(this.minUtility,this.maxUtility);
-//            List<BidDetails> bidDetails = this.SOS.getBidsinRange(range);
-//            System.out.println("Bids =" + bidDetails.size());
-//            
-//            range = new Range(0,1);
-//            bidDetails = this.SOS.getBidsinRange(range);
-//            System.out.println("Bids =" + bidDetails.size());
-//            //
-            
             QOffer tmpQoffer = new QOffer(maxBid,maxUtility,maxUtility);
             qValues.add(tmpQoffer);
         } catch (Exception e) {
@@ -87,7 +69,6 @@ public class Agent13 extends AbstractNegotiationParty {
         Opponent.mapDomain(info);
         this.getWeights(info);
 
-        offerMade=false;
     }
 
     /**
@@ -109,30 +90,7 @@ public class Agent13 extends AbstractNegotiationParty {
         }else if (this.qValues.isEmpty()){
             this.addNashQvalues();
         }
-/*
-        if (this.myLastQOffer!=null){
-        	double maxQvalue=this.myLastQOffer.getQvalue();
-        	if (this.qValues.peek()!= null) {
-        		maxQvalue = this.qValues.peek().getQvalue();
-        	}
-            if (lastOfferAcceptedBySucceedingAgent)
-                myLastQOffer.updateQvalue(rewardAcceptOnce,maxQvalue);
-            else
-                myLastQOffer.updateQvalue(rewardReject,maxQvalue);
-        }
-*/
-//        if (this.lastOffer!=null && this.myLastQOffer!=null && this.qValues.peek()!=null){
-//            try{
-//                double lastOfferUtility = this.getUtility(lastOffer.getBid());
-//                if (lastOfferUtility >=  this.myLastQOffer.getUtility()
-//                        && lastOfferUtility >= this.qValues.peek().getUtility()) {
-//                    this.qValues.add(myLastQOffer);
-//                    if (lastOfferUtility<minUtility) {
-//                        System.out.println("###############################");
-//                        System.out.println("below threshold: " + lastOfferUtility);
-//                        System.out.println("threshold: " + minUtility);
-//                        System.out.println("###############################");
-//                    }
+
         if (this.lastOffer!=null) {
             if (myLastQOffer!=null){
                 if (this.getUtility(lastOffer.getBid())>=myLastQOffer.getUtility()){
@@ -146,12 +104,9 @@ public class Agent13 extends AbstractNegotiationParty {
                 }
             }
         }
-        
-        //if (myLastQOffer!=null)
-        //    this.qValues.add(myLastQOffer);
+
         QOffer myNextQOffer = this.qValues.poll();
 
-        offerMade=true;
         this.lastOffer = new Offer(this.getPartyId(),myNextQOffer.getBid());
         
         myLastQOffer=myNextQOffer;
@@ -172,10 +127,6 @@ public class Agent13 extends AbstractNegotiationParty {
             Offer offer = (Offer) act;
             
             if (this.lastOffer != null) {
-                if (offerMade){
-                    offerMade=false;
-                    lastOfferAcceptedBySucceedingAgent=false;
-                }
             	this.getOpponent(sender).addOffer(this.lastOffer, -1, getTimeLine().getTime());
             }
             this.getOpponent(sender).addOffer(offer, 0, getTimeLine().getTime());
@@ -187,11 +138,6 @@ public class Agent13 extends AbstractNegotiationParty {
            
         } else if(act instanceof Accept) {
 
-            if (offerMade) {
-                lastOfferAcceptedBySucceedingAgent=true;
-                offerMade=false;
-            }
-        	
         	if(this.lastOffer != null) {
         		this.getOpponent(sender).addOffer(this.lastOffer, 1, getTimeLine().getTime());
         	}

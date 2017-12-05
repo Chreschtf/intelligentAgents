@@ -27,15 +27,7 @@ class GirValue {
 		this.valueInt      = value.valueInt;
 		this.type          = value.type;
 		
-//		this.freq          = value.freq;
-//		this.vi            = value.vi;
-//		
-//		this.offered       = value.offered;
-//		this.accepted      = value.accepted;
-//		this.rejected      = value.rejected;
-		
-//		this.probability = probability;
-//		this.rate = rate;
+
 	}
 
 	protected void addValue(int action) {
